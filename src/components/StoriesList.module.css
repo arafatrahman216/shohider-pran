@@ -1,0 +1,49 @@
+.wrapper {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 2rem;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.storyCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  background: var(--bg-raised);
+}
+
+.storyMeta {
+  font-size: 0.8rem;
+  color: var(--brass-token);
+  margin: 0 0 0.6rem;
+  font-family: var(--font-mono), monospace;
+}
+
+.storyBody {
+  line-height: 1.7;
+  font-size: 0.98rem;
+  white-space: pre-wrap;
+}
+
+.storyAuthor {
+  margin-top: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
