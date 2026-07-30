@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Shohider Pran — Registry & Support for the July Uprising",
+    "description": "An official-record registry and support platform for the martyrs and injured of the July Mass Uprising."
+  },
+  "nav": {
+    "brand": "Shohider Pran",
+    "switchLocale": "বাংলা",
+    "register": "Register"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "a11y": {
+    "groupLabel": "Accessibility settings",
+    "largeText": "Large text",
+    "highContrast": "High contrast"
+  },
+  "home": {
+    "kicker": "শহীদের প্রাণ · July Mass Uprising, 2024",
+    "title": "The official record, and no one turned away.",
+    "subtitle": "A registry for the martyrs and the injured of the July Uprising — matched against the government's gazette where possible, and open to everyone else the record may have missed.",
+    "ctaPrimary": "Register a martyr or injury",
+    "ctaSecondary": "Search the registry",
+    "guardrail": "This platform does not decide who is a legitimate martyr or injured person. It reflects the official record, plus a clearly labelled pending-review queue for people the list may have missed.",
+    "counters": {
+      "heading": "The record so far",
+      "source": "Source: DGHS, via July Shaheed Smrity Foundation (jssfbd.com)",
+      "martyrs": "Martyrs (shohid)",
+      "injured": "Injured (ahoto)",
+      "families": "Families in need"
+    },
+    "calendar": {
+      "heading": "১ – ৩৬ জুলাই",
+      "subheading": "The Extended Calendar",
+      "intro": "The public did not stop counting in July when the calendar did — the uprising is still remembered day by day, straight through to ৩৬ জুলাই, ৫ আগস্ট.",
+      "sourceNote": "Summarized from julyarchive.cridobd.org's day-by-day account."
+    }
+  },
+  "footer": {
+    "guardrailAi": "No AI agent in this system ever verifies someone's status. AI drafts, screens, and summarizes — a human approves anything that leaves the system.",
+    "guardrailNumbers": "Every number on this dashboard is either verified against the official record or explicitly labelled pending — never blended.",
+    "rights": "Shohider Pran"
+  }
+}

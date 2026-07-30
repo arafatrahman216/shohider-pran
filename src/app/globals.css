@@ -1,0 +1,216 @@
+/*
+  Design tokens — Shohider Pran (শহীদের প্রাণ)
+  Base hex values are fixed brand colors; --accent/--accent-secondary/--brass/--muted
+  are semantic tokens that shift LUMINANCE (not hue) between themes so the palette
+  reads as one identity in both light and dark mode.
+*/
+
+:root {
+  --ink: #14140f;
+  --paper: #f2efe6;
+  --maroon: #5c1a1a;
+  --bottle-green: #1b3a2b;
+  --brass: #a9823d;
+  --ash: #8a867c;
+
+  --font-display-en: var(--font-fraunces);
+  --font-display-bn: var(--font-noto-serif-bengali);
+  --font-body-en: var(--font-work-sans);
+  --font-body-bn: var(--font-hind-siliguri);
+  --font-mono: var(--font-plex-mono);
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --ease-stamp: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-med: 400ms;
+  --dur-slow: 900ms;
+}
+
+/* Base fallback (no-JS / pre-hydration): matches light theme; the attribute
+   selectors below always win on specificity once the init script runs. */
+:root {
+  --bg: var(--paper);
+  --bg-raised: #e9e4d5;
+  --fg: var(--ink);
+  --accent: #5c1a1a;
+  --accent-fg: #f2efe6;
+  --accent-secondary: #1b3a2b;
+  --brass-token: #8c6a2e;
+  --muted: #625e55;
+  --border: rgba(20, 20, 15, 0.14);
+  --border-strong: rgba(20, 20, 15, 0.28);
+  color-scheme: light;
+}
+
+:root[data-theme="light"] {
+  --bg: var(--paper);
+  --bg-raised: #e9e4d5;
+  --fg: var(--ink);
+  --accent: #5c1a1a;
+  --accent-fg: #f2efe6;
+  --accent-secondary: #1b3a2b;
+  --brass-token: #8c6a2e;
+  --muted: #625e55;
+  --border: rgba(20, 20, 15, 0.14);
+  --border-strong: rgba(20, 20, 15, 0.28);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--ink);
+  --bg-raised: #1d1d16;
+  --fg: var(--paper);
+  --accent: #c17b6f;
+  --accent-fg: #14140f;
+  --accent-secondary: #4f9174;
+  --brass-token: #d1ac72;
+  --muted: #a6a296;
+  --border: rgba(242, 239, 230, 0.14);
+  --border-strong: rgba(242, 239, 230, 0.28);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--ink);
+    --bg-raised: #1d1d16;
+    --fg: var(--paper);
+    --accent: #c17b6f;
+    --accent-fg: #14140f;
+    --accent-secondary: #4f9174;
+    --brass-token: #d1ac72;
+    --muted: #a6a296;
+    --border: rgba(242, 239, 230, 0.14);
+    --border-strong: rgba(242, 239, 230, 0.28);
+    color-scheme: dark;
+  }
+}
+
+/* Accessibility: large text */
+html.a11y-large-text {
+  font-size: 118%;
+}
+
+/* Accessibility: high contrast — pins full ink/paper contrast regardless of theme shade */
+html.a11y-high-contrast[data-theme="light"] {
+  --fg: #000000;
+  --bg: #ffffff;
+  --border-strong: rgba(0, 0, 0, 0.6);
+}
+html.a11y-high-contrast[data-theme="dark"] {
+  --fg: #ffffff;
+  --bg: #000000;
+  --border-strong: rgba(255, 255, 255, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body-bn), var(--font-body-en), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--dur-med) ease, color var(--dur-med) ease;
+}
+
+:lang(en) body {
+  font-family: var(--font-body-en), var(--font-body-bn), sans-serif;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display-bn), var(--font-display-en), serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:lang(en) h1,
+:lang(en) h2,
+:lang(en) h3,
+:lang(en) .display {
+  font-family: var(--font-display-en), var(--font-display-bn), serif;
+}
+
+.mono {
+  font-family: var(--font-mono), monospace;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+.theme-toggle,
+.a11y-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+.theme-toggle:hover,
+.a11y-toggle:hover {
+  border-color: var(--border-strong);
+}
+
+.theme-toggle-icon {
+  display: inline-flex;
+  color: var(--brass-token);
+}
+
+.a11y-toggle[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.a11y-toggle-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Motion: reduced-motion users get simple opacity fades only */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

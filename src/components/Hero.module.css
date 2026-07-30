@@ -1,0 +1,98 @@
+.hero {
+  padding: 4.5rem 1.5rem 3rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: reveal-up var(--dur-slow) var(--ease-stamp) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes reveal-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation-name: reveal-fade;
+    transform: none;
+  }
+  @keyframes reveal-fade {
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--brass-token);
+  margin-bottom: 1.2rem;
+}
+
+.kickerLine {
+  width: 1.4rem;
+  height: 1px;
+  background: var(--brass-token);
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.15;
+  margin: 0 0 1.1rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+}
+
+.ctas {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-stamp), background-color var(--dur-fast) ease;
+}
+
+.ctaPrimary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.ctaPrimary:active {
+  transform: scale(0.97);
+}
+
+.ctaSecondary {
+  border: 1px solid var(--border-strong);
+  color: var(--fg);
+}
+
+.ctaSecondary:active {
+  transform: scale(0.97);
+}

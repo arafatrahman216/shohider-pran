@@ -1,0 +1,179 @@
+.section {
+  padding: 3rem 1.5rem 4rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.sectionHead {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.subheading {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--brass-token);
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+}
+
+.heading {
+  margin: 0 0 0.75rem;
+}
+
+.intro {
+  color: var(--muted);
+  max-width: 38rem;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.25rem 1.25rem;
+  scroll-snap-type: x proximity;
+}
+
+.strip::-webkit-scrollbar {
+  height: 6px;
+}
+.strip::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+.chip {
+  flex: none;
+  scroll-snap-align: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  cursor: pointer;
+  color: var(--fg);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: chip-in var(--dur-med) var(--ease-stamp) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes chip-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    animation-name: chip-fade;
+    transform: none;
+  }
+  @keyframes chip-fade {
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.chip:hover {
+  border-color: var(--border-strong);
+}
+
+.chipSelected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-raised));
+}
+
+.chipDay {
+  font-family: var(--font-display-bn), serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.chipWeekday {
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.chipFinal {
+  border-color: var(--brass-token);
+  animation-name: chip-in, stamp-settle;
+  animation-duration: var(--dur-med), 700ms;
+  animation-delay: var(--delay, 0ms), calc(var(--delay, 0ms) + var(--dur-med));
+  animation-timing-function: var(--ease-stamp), var(--ease-stamp);
+  animation-fill-mode: forwards, forwards;
+}
+
+@keyframes stamp-settle {
+  0% {
+    transform: scale(1.35) rotate(-4deg);
+  }
+  60% {
+    transform: scale(0.94) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chipFinal {
+    animation-name: chip-fade;
+  }
+}
+
+.detail {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+
+.detailHead {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.detailDate {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8rem;
+  color: var(--brass-token);
+}
+
+.detailWeekday {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.detailText {
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.detailCta {
+  display: inline-block;
+  margin-top: 1.1rem;
+  padding: 0.65rem 1.2rem;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-fg);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
