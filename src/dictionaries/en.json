@@ -122,7 +122,13 @@
       "whatsNextBody": "Verified and self-reported registrations both continue to the entitlement and support process from here — a human reviews anything that needs judgment before it moves forward."
     },
     "switchToChat": "Prefer to describe it in your own words instead?",
-    "switchToChatLink": "Talk to the intake assistant"
+    "switchToChatLink": "Talk to the intake assistant",
+    "draft": {
+      "question": "You have a saved, unsubmitted registration in progress.",
+      "savedAt": "Saved {date}",
+      "resume": "Resume where I left off",
+      "startOver": "Start over"
+    }
   },
   "intake": {
     "title": "Tell us about them",
