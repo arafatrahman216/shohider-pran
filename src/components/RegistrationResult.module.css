@@ -68,6 +68,16 @@
   background: var(--bg);
 }
 
+.shareStoryLink {
+  font-size: 0.85rem;
+  margin: 0 0 0.9rem;
+}
+
+.shareStoryLink a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 .whatsNext {
   border-top: 1px solid var(--border);
   padding-top: 1rem;

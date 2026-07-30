@@ -1,11 +1,13 @@
 "use client";
 
-import type { Dictionary } from "@/lib/dictionaries";
+import Link from "next/link";
+import type { Dictionary, Locale } from "@/lib/dictionaries";
 import type { RegistrantDTO, UploadState } from "@/lib/registrant-dto";
 import styles from "./RegistrationResult.module.css";
 
 export default function RegistrationResult({
   dict,
+  locale,
   registrant,
   submitting,
   uploadState,
@@ -14,6 +16,7 @@ export default function RegistrationResult({
   onUploadFile,
 }: {
   dict: Dictionary;
+  locale: Locale;
   registrant: RegistrantDTO;
   submitting: boolean;
   uploadState: UploadState;
@@ -32,6 +35,7 @@ export default function RegistrationResult({
           <div className={styles.registrationId}>
             {t.result.registrationId}: {registrant.id}
           </div>
+          <ShareStoryLink dict={dict} locale={locale} registrantId={registrant.id} />
           <WhatsNext t={t} />
         </div>
       )}
@@ -89,6 +93,7 @@ export default function RegistrationResult({
               <p className={styles.resultBody}>{uploadState.document.screeningNote}</p>
             </div>
           )}
+          <ShareStoryLink dict={dict} locale={locale} registrantId={registrant.id} />
           <WhatsNext t={t} />
         </div>
       )}
@@ -102,5 +107,23 @@ function WhatsNext({ t }: { t: Dictionary["register"] }) {
       <p className={styles.whatsNextTitle}>{t.result.whatsNext}</p>
       <p className={styles.candidateMeta}>{t.result.whatsNextBody}</p>
     </div>
+  );
+}
+
+function ShareStoryLink({
+  dict,
+  locale,
+  registrantId,
+}: {
+  dict: Dictionary;
+  locale: Locale;
+  registrantId: string;
+}) {
+  return (
+    <p className={styles.shareStoryLink}>
+      <Link href={`/${locale}/stories/submit?registrantId=${registrantId}`}>
+        {dict.stories.shareLink}
+      </Link>
+    </p>
   );
 }

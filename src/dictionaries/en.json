@@ -157,5 +157,30 @@
     "sendButton": "Mark as sent",
     "sending": "Sending…",
     "sentNote": "This app has no outbound email/SMS integration yet — this only records that a human handled it."
+  },
+  "stories": {
+    "navLabel": "Amar Golpo",
+    "publicTitle": "Amar Golpo — their stories, in their families' words",
+    "publicSubtitle": "Shared by families of registered martyrs and injured people. Translations drafted by AI are held for human review before they appear here.",
+    "empty": "No stories yet.",
+    "shareLink": "Share their story (Amar Golpo)",
+    "submitTitle": "Share their story",
+    "submitSubtitle": "Write in your own words, in either Bangla or English — we'll take care of showing it in both.",
+    "authorNameLabel": "Your name (optional, shown as the storyteller)",
+    "authorNamePlaceholder": "Your name",
+    "bodyLabel": "Their story",
+    "bodyPlaceholder": "Share a memory, who they were, what they loved…",
+    "submitButton": "Share this story",
+    "submitting": "Sharing…",
+    "submitted": "Thank you for sharing. It's now visible in the language you wrote it in — a translation is being prepared and will appear once reviewed.",
+    "errorRequired": "Please write something before sharing.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "reviewTitle": "Story translations awaiting review",
+    "reviewSubtitle": "AI-drafted translations only — the original text a family wrote is already visible and untouched here.",
+    "reviewEmpty": "No translations waiting for review.",
+    "originalLabel": "Original",
+    "draftTranslationLabel": "AI-drafted translation (not yet visible publicly)",
+    "approveButton": "Approve translation",
+    "approving": "Approving…"
   }
 }

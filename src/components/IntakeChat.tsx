@@ -130,6 +130,7 @@ export default function IntakeChat({
     return (
       <RegistrationResult
         dict={dict}
+        locale={locale}
         registrant={registrant}
         submitting={submitting}
         uploadState={uploadState}

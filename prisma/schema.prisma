@@ -39,6 +39,11 @@ enum EscalationStatus {
   SENT
 }
 
+enum Locale {
+  BN
+  EN
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -79,6 +84,7 @@ model Registrant {
   candidates       MatchCandidate[]
   documents        Document[]
   escalationDrafts EscalationDraft[]
+  stories          Story[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,6 +122,28 @@ model Document {
   screeningStatus ScreeningStatus @default(PENDING)
   screeningNote   String?
   screenedAt      DateTime?
+
+  @@index([registrantId])
+}
+
+// Amar Golpo (Section 1 extra feature 3a) — a family member's memorial
+// story for a registrant. Submitted in one language; the multilingual sync
+// agent (Section 6) drafts the other language, always flagged for review
+// and never auto-published. The submitted language is trusted at
+// submission (it's the family's own words, not AI content) — only the
+// AI-drafted translation needs a reviewed flag before it can be shown.
+model Story {
+  id             String   @id @default(cuid())
+  registrantId   String
+  registrant     Registrant @relation(fields: [registrantId], references: [id])
+  authorName     String?
+  originalLocale Locale
+  bodyBn         String?
+  bodyEn         String?
+  bnReviewed     Boolean  @default(false)
+  enReviewed     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@index([registrantId])
 }

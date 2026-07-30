@@ -139,6 +139,7 @@ export default function RegisterWizard({
     return (
       <RegistrationResult
         dict={dict}
+        locale={locale}
         registrant={registrant}
         submitting={submitting}
         uploadState={uploadState}
