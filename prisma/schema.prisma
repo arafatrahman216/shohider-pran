@@ -32,6 +32,13 @@ enum ScreeningStatus {
   SCREENING_FAILED
 }
 
+// Section 6's proactive follow-up agent only ever produces a draft — moving
+// to SENT requires an explicit human (admin) action, never an automatic one.
+enum EscalationStatus {
+  DRAFT
+  SENT
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -69,8 +76,9 @@ model Registrant {
   matchedRecordId String?
   matchedRecord   GazetteRecord? @relation(fields: [matchedRecordId], references: [id])
 
-  candidates MatchCandidate[]
-  documents  Document[]
+  candidates       MatchCandidate[]
+  documents        Document[]
+  escalationDrafts EscalationDraft[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,6 +116,23 @@ model Document {
   screeningStatus ScreeningStatus @default(PENDING)
   screeningNote   String?
   screenedAt      DateTime?
+
+  @@index([registrantId])
+}
+
+// Section 6's proactive follow-up agent output for a registrant whose
+// verification has stayed open past a threshold. Drafts only — an admin
+// must explicitly mark one SENT before anything leaves the system, and even
+// then this app has no outbound email/SMS integration: SENT just records
+// that a human handled it, not that a message was automatically delivered.
+model EscalationDraft {
+  id           String           @id @default(cuid())
+  registrantId String
+  registrant   Registrant       @relation(fields: [registrantId], references: [id])
+  draftText    String
+  status       EscalationStatus @default(DRAFT)
+  createdAt    DateTime         @default(now())
+  sentAt       DateTime?
 
   @@index([registrantId])
 }

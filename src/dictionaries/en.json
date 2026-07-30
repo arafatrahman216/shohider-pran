@@ -142,5 +142,20 @@
       "heading": "Most-registered districts",
       "empty": "No registrations yet."
     }
+  },
+  "followUp": {
+    "title": "Follow-up drafts",
+    "subtitle": "Registrations still unresolved after 45 days. The AI only drafts a note — nothing is sent anywhere until an admin clicks Send.",
+    "scanButton": "Scan for stale registrations",
+    "scanning": "Scanning…",
+    "scanResult": "Found {scanned} unresolved past 45 days, drafted {drafted} new note(s).",
+    "empty": "No pending follow-up drafts right now.",
+    "registrationId": "Registration ID",
+    "district": "District",
+    "category": "Category",
+    "daysOpen": "Days open",
+    "sendButton": "Mark as sent",
+    "sending": "Sending…",
+    "sentNote": "This app has no outbound email/SMS integration yet — this only records that a human handled it."
   }
 }

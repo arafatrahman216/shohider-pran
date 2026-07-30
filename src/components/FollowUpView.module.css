@@ -1,0 +1,104 @@
+.wrapper {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.scanRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.scanButton {
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.scanButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scanResult {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.draftCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  background: var(--bg-raised);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.metaLabel {
+  color: var(--muted);
+}
+
+.draftText {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem;
+  background: var(--bg);
+  margin-bottom: 0.9rem;
+}
+
+.sendButton {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--fg);
+}
+
+.sendButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sentNote {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
