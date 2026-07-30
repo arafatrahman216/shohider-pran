@@ -105,6 +105,22 @@
       "registrationId": "Registration ID",
       "whatsNext": "What happens next",
       "whatsNextBody": "Verified and self-reported registrations both continue to the entitlement and support process from here — a human reviews anything that needs judgment before it moves forward."
-    }
+    },
+    "switchToChat": "Prefer to describe it in your own words instead?",
+    "switchToChatLink": "Talk to the intake assistant"
+  },
+  "intake": {
+    "title": "Tell us about them",
+    "starterMessage": "Hello — I'm here to help you register a martyr or an injured person from the July Uprising. Were you registering a martyr (shohid), or someone who was injured (ahoto)?",
+    "placeholder": "Type your reply…",
+    "send": "Send",
+    "thinking": "Thinking…",
+    "unavailable": "The intake assistant isn't set up right now. Please use the step-by-step form instead.",
+    "errorGeneric": "Something went wrong reaching the assistant. Please try again.",
+    "switchToForm": "Prefer a simple step-by-step form instead?",
+    "switchToFormLink": "Use the step-by-step form",
+    "confirmTitle": "Please confirm these details",
+    "confirmButton": "Confirm & submit",
+    "editButton": "No, let me correct something"
   }
 }

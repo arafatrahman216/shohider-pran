@@ -1,0 +1,159 @@
+.wrapper {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.title {
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+}
+
+.switchLink {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.switchLink a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.bubbleModel {
+  align-self: flex-start;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+}
+
+.bubbleUser {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.thinking {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.inputRow {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.sendButton {
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.sendButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.notice {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.confirmCard {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--bg-raised);
+}
+
+.confirmTitle {
+  margin: 0 0 0.9rem;
+  font-size: 1.1rem;
+}
+
+.confirmRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.confirmLabel {
+  color: var(--muted);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.buttonPrimary,
+.buttonGhost {
+  padding: 0.65rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.buttonPrimary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.buttonPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonGhost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border-strong);
+}
