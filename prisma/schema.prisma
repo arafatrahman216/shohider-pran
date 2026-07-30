@@ -44,6 +44,15 @@ enum Locale {
   EN
 }
 
+// Section 1 extra feature (3d, collective letter/petition generator). AI
+// drafts the letter text; it stays DRAFT (not signable, not public) until a
+// human admin explicitly approves it.
+enum PetitionStatus {
+  DRAFT
+  APPROVED
+  CLOSED
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -81,10 +90,12 @@ model Registrant {
   matchedRecordId String?
   matchedRecord   GazetteRecord? @relation(fields: [matchedRecordId], references: [id])
 
-  candidates       MatchCandidate[]
-  documents        Document[]
-  escalationDrafts EscalationDraft[]
-  stories          Story[]
+  candidates          MatchCandidate[]
+  documents           Document[]
+  escalationDrafts    EscalationDraft[]
+  stories             Story[]
+  proposedPetitions   Petition[]          @relation("ProposedPetitions")
+  petitionSignatures  PetitionSignature[] @relation("PetitionSignatures")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,6 +157,39 @@ model Story {
   updatedAt      DateTime @updatedAt
 
   @@index([registrantId])
+}
+
+// Section 1 extra feature (3d) — a collective letter/petition. The AI
+// drafts formal letter text from the proposer's stated cause; it cannot be
+// signed or shown publicly until an admin approves it. Signatures are tied
+// to real Registrant IDs only — no anonymous or free-text names — so signer
+// counts can't be inflated or fabricated.
+model Petition {
+  id           String         @id @default(cuid())
+  title        String
+  ask          String
+  draftText    String?
+  status       PetitionStatus @default(DRAFT)
+  proposedById String
+  proposedBy   Registrant     @relation("ProposedPetitions", fields: [proposedById], references: [id])
+  createdAt    DateTime       @default(now())
+  approvedAt   DateTime?
+
+  signatures PetitionSignature[]
+
+  @@index([proposedById])
+}
+
+model PetitionSignature {
+  id           String     @id @default(cuid())
+  petitionId   String
+  petition     Petition   @relation(fields: [petitionId], references: [id])
+  registrantId String
+  registrant   Registrant @relation("PetitionSignatures", fields: [registrantId], references: [id])
+  signedAt     DateTime   @default(now())
+
+  @@unique([petitionId, registrantId])
+  @@index([petitionId])
 }
 
 // Section 6's proactive follow-up agent output for a registrant whose
