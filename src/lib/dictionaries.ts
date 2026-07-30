@@ -1,4 +1,3 @@
-import "server-only";
 import type en from "@/dictionaries/en.json";
 
 export const locales = ["bn", "en"] as const;

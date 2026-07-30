@@ -1,4 +1,3 @@
-import "server-only";
 import type { Content, FunctionDeclaration } from "@google/genai";
 import { getGeminiClient, GEMINI_MODEL } from "@/lib/gemini";
 import type { Locale } from "@/lib/dictionaries";

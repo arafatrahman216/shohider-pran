@@ -1,4 +1,3 @@
-import "server-only";
 import { prisma } from "@/lib/db";
 import { getGeminiClient, GEMINI_MODEL, isGeminiConfigured } from "@/lib/gemini";
 

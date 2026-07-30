@@ -41,6 +41,34 @@ by default (`/en` for English).
   plan), never be hand-authored. `prisma/seed.ts` only ever inserts data
   clearly marked `seed_dev_placeholder`.
 
+## Scraper (Section 5)
+
+```bash
+npx playwright install chromium   # one-time, for the jssfbd.com scraper
+npm run scrape
+```
+
+This runs both source scrapers, then Section 2's auto-re-verification pass
+over every pending registration. Same effect via API: `POST /api/scrape/dghs`
+and `POST /api/scrape/jssfbd` (admin actions, no auth gate yet).
+
+- **medical-info.dghs.gov.bd** — real and verified during development: it's
+  the official DGHS public medical-case registry (the source jssfbd.com
+  itself cites), robots.txt allows it, and it exposes a plain JSON API (no
+  headless browser needed) behind its নিহত/আহত (deceased/injured) tabs.
+  Clean structured data, so `needsReview: false`.
+- **jssfbd.com/36july-martyrs/** — confirmed JS-rendered (no static table),
+  so this uses Playwright + a Gemini narrative-extraction fallback per
+  Section 5 point 3, and every row is `needsReview: true`. This module's
+  architecture is correct but **not verified against the live site** — this
+  sandbox's outbound proxy doesn't carry headless-Chromium traffic at all
+  (confirmed against example.com and google.com too, not specific to this
+  site), so it needs a real deployment environment to validate.
+- **djmu.portal.gov.bd** — has a broken TLS certificate; skipped rather than
+  bypassing certificate verification.
+- **july36.gov.bd** — currently just a splash/coming-soon page, no list
+  content to scrape yet.
+
 ## Learn more
 
 - [Next.js Documentation](https://nextjs.org/docs)
