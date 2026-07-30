@@ -23,6 +23,15 @@ enum VerificationStatus {
   REJECTED
 }
 
+// Section 6's document pre-screening agent only ever produces an advisory
+// note for a human reviewer — SCREENED never implies approved or rejected,
+// only that the AI has left a note for the reviewer to read.
+enum ScreeningStatus {
+  PENDING
+  SCREENED
+  SCREENING_FAILED
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -92,6 +101,13 @@ model Document {
   fileName     String
   fileUrl      String
   uploadedAt   DateTime   @default(now())
+
+  // Document pre-screening agent (Section 6) output — advisory only, never
+  // a verification decision. Left null until the agent runs (or forever, if
+  // GEMINI_API_KEY is unset).
+  screeningStatus ScreeningStatus @default(PENDING)
+  screeningNote   String?
+  screenedAt      DateTime?
 
   @@index([registrantId])
 }

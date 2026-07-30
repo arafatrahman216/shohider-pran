@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dictionary } from "@/lib/dictionaries";
-import type { RegistrantDTO } from "@/lib/registrant-dto";
+import type { RegistrantDTO, UploadState } from "@/lib/registrant-dto";
 import styles from "./RegistrationResult.module.css";
 
 export default function RegistrationResult({
@@ -16,7 +16,7 @@ export default function RegistrationResult({
   dict: Dictionary;
   registrant: RegistrantDTO;
   submitting: boolean;
-  uploadState: "idle" | "uploading" | "done";
+  uploadState: UploadState;
   onConfirmCandidate: (gazetteRecordId: string) => void;
   onRejectCandidates: () => void;
   onUploadFile: (file: File) => void;
@@ -79,8 +79,16 @@ export default function RegistrationResult({
                 if (file) onUploadFile(file);
               }}
             />
-            {uploadState === "done" && <span className={styles.candidateMeta}>{t.result.uploadedNote}</span>}
+            {uploadState.status === "done" && (
+              <span className={styles.candidateMeta}>{t.result.uploadedNote}</span>
+            )}
           </div>
+          {uploadState.status === "done" && uploadState.document.screeningStatus === "SCREENED" && (
+            <div className={styles.screeningNote}>
+              <p className={styles.label}>{t.result.screeningNoteLabel}</p>
+              <p className={styles.resultBody}>{uploadState.document.screeningNote}</p>
+            </div>
+          )}
           <WhatsNext t={t} />
         </div>
       )}

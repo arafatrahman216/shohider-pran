@@ -101,6 +101,7 @@
       "uploadLabel": "Upload a supporting document (optional)",
       "uploadButton": "Upload",
       "uploadedNote": "Document uploaded. A human reviewer will consider it.",
+      "screeningNoteLabel": "AI screening note for the reviewer (advisory only — not a decision)",
       "trackedStatus": "You can track this registration's status any time using its ID below.",
       "registrationId": "Registration ID",
       "whatsNext": "What happens next",
