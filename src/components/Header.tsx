@@ -34,7 +34,7 @@ export default function Header({
         <Link href={`/${otherLocale}`} className={styles.localeLink}>
           {dict.nav.switchLocale}
         </Link>
-        <Link href={`/${locale}#register`} className={styles.registerLink}>
+        <Link href={`/${locale}/register`} className={styles.registerLink}>
           {dict.nav.register}
         </Link>
       </nav>

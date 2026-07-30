@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# শহীদের প্রাণ · Shohider Pran
 
-## Getting Started
+Registry and support platform for the martyrs and injured of the July Mass
+Uprising. Next.js App Router, Bangla (default) + English, Prisma + SQLite for
+local dev, Gemini 2.5 Flash for the AI/agentic features.
 
-First, run the development server:
+This tool does not decide who is a legitimate martyr or injured person — it
+reflects the official record, plus a clearly labelled pending-review queue
+for people the list may have missed. No AI agent in this system ever sets
+verification status.
+
+## Getting started
 
 ```bash
+npm install
+cp .env.local.example .env.local   # add GEMINI_API_KEY when you have one
+
+npx prisma migrate dev   # creates dev.db and applies the schema
+npx prisma db seed       # loads placeholder gazette records for local testing
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) — it redirects to `/bn`
+by default (`/en` for English).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Notes for this codebase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **This is not the Next.js you know.** This project runs Next.js 16, which
+  renamed `middleware.ts` to `proxy.ts` (`export function proxy` instead of
+  `middleware`) among other breaking changes. Check
+  `node_modules/next/dist/docs/` before assuming an API works the way it used
+  to.
+- **This is Prisma 7, not 5/6.** Driver adapters are mandatory
+  (`@prisma/adapter-better-sqlite3` here), the generator is `prisma-client`
+  (not `prisma-client-js`) with a required `output` path, and
+  `prisma.config.ts` — not the schema's `datasource` block — holds the
+  connection URL. See `.agents/skills/prisma-upgrade-v7/` (installed
+  automatically by `prisma init`) if something doesn't match v6 expectations.
+- Real gazette data must come from the scraper module (Section 5 of the build
+  plan), never be hand-authored. `prisma/seed.ts` only ever inserts data
+  clearly marked `seed_dev_placeholder`.
 
-## Learn More
+## Learn more
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)

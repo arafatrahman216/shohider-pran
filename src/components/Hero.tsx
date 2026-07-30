@@ -26,7 +26,7 @@ export default function Hero({
         {dict.home.subtitle}
       </p>
       <div className={`${styles.ctas} ${styles.reveal}`} style={{ ["--delay" as string]: "360ms" }}>
-        <Link href={`/${locale}#register`} id="register" className={styles.ctaPrimary}>
+        <Link href={`/${locale}/register`} className={styles.ctaPrimary}>
           {dict.home.ctaPrimary}
         </Link>
         <Link href={`/${locale}#search`} className={styles.ctaSecondary}>
