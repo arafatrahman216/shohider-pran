@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { districts } from "@/lib/districts";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
 import type { DocumentDTO, RegistrantDTO, UploadState } from "@/lib/registrant-dto";
+import {
+  clearDraft,
+  getDraftSnapshot,
+  getServerDraftSnapshot,
+  saveDraft,
+  subscribeDraft,
+  type RegistrationDraft,
+} from "@/lib/registration-draft";
 import RegistrationResult from "./RegistrationResult";
 import styles from "./RegisterWizard.module.css";
 
@@ -70,6 +78,37 @@ export default function RegisterWizard({
   const [submitting, setSubmitting] = useState(false);
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
+  const [draftChoiceMade, setDraftChoiceMade] = useState(false);
+
+  const draftRaw = useSyncExternalStore(subscribeDraft, getDraftSnapshot, getServerDraftSnapshot);
+  const draft: RegistrationDraft<FormState> | null = (() => {
+    if (!draftRaw) return null;
+    try {
+      return JSON.parse(draftRaw) as RegistrationDraft<FormState>;
+    } catch {
+      return null;
+    }
+  })();
+  const showResumeBanner = Boolean(draft) && !draftChoiceMade;
+
+  useEffect(() => {
+    if (showResumeBanner) return;
+    if (JSON.stringify(form) === JSON.stringify(initialForm) && stepIndex === 0) return;
+    saveDraft(form, stepIndex);
+  }, [form, stepIndex, showResumeBanner]);
+
+  function resumeDraft() {
+    if (draft) {
+      setForm(draft.form);
+      setStepIndex(draft.stepIndex);
+    }
+    setDraftChoiceMade(true);
+  }
+
+  function discardDraft() {
+    clearDraft();
+    setDraftChoiceMade(true);
+  }
 
   const steps = getSteps(form.isProxy);
   const step = steps[stepIndex];
@@ -125,6 +164,7 @@ export default function RegisterWizard({
       });
       if (!res.ok) throw new Error("request failed");
       const data = (await res.json()) as { registrant: RegistrantDTO };
+      clearDraft();
       setRegistrant(data.registrant);
     } catch {
       setError(t.errorGeneric);
@@ -187,6 +227,27 @@ export default function RegisterWizard({
         onRejectCandidates={rejectCandidates}
         onUploadFile={uploadDocument}
       />
+    );
+  }
+
+  if (showResumeBanner && draft) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.resumeBanner}>
+          <p className={styles.question}>{t.draft.question}</p>
+          <p className={styles.hint}>
+            {t.draft.savedAt.replace("{date}", new Date(draft.savedAt).toLocaleString())}
+          </p>
+          <div className={styles.actions}>
+            <button type="button" className={styles.buttonSecondary} onClick={discardDraft}>
+              {t.draft.startOver}
+            </button>
+            <button type="button" className={styles.buttonPrimary} onClick={resumeDraft}>
+              {t.draft.resume}
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
