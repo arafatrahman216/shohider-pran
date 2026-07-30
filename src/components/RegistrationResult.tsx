@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
 import type { RegistrantDTO, UploadState } from "@/lib/registrant-dto";
+import CameraCapture from "./CameraCapture";
 import styles from "./RegistrationResult.module.css";
 
 export default function RegistrationResult({
@@ -87,6 +88,19 @@ export default function RegistrationResult({
               <span className={styles.candidateMeta}>{t.result.uploadedNote}</span>
             )}
           </div>
+          {uploadState.status !== "done" && (
+            <CameraCapture
+              onCapture={onUploadFile}
+              labels={{
+                openCamera: t.result.cameraOpenButton,
+                guideHint: t.result.cameraGuideHint,
+                capture: t.result.cameraCapture,
+                cancel: t.result.cameraCancel,
+                unsupported: t.result.cameraUnsupported,
+                permissionDenied: t.result.cameraPermissionDenied,
+              }}
+            />
+          )}
           {uploadState.status === "done" && uploadState.document.screeningStatus === "SCREENED" && (
             <div className={styles.screeningNote}>
               <p className={styles.label}>{t.result.screeningNoteLabel}</p>
