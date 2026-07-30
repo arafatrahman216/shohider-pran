@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { districts } from "@/lib/districts";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
-import type { RegistrantDTO } from "@/lib/registrant-dto";
+import type { DocumentDTO, RegistrantDTO, UploadState } from "@/lib/registrant-dto";
 import RegistrationResult from "./RegistrationResult";
 import styles from "./RegisterWizard.module.css";
 
@@ -42,7 +42,7 @@ export default function RegisterWizard({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
-  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done">("idle");
+  const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
 
   const step = STEPS[stepIndex];
   const isLast = stepIndex === STEPS.length - 1;
@@ -127,11 +127,12 @@ export default function RegisterWizard({
 
   async function uploadDocument(file: File) {
     if (!registrant) return;
-    setUploadState("uploading");
+    setUploadState({ status: "uploading" });
     const body = new FormData();
     body.append("file", file);
-    await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
-    setUploadState("done");
+    const res = await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
+    const data = (await res.json()) as { document: DocumentDTO };
+    setUploadState({ status: "done", document: data.document });
   }
 
   if (registrant) {

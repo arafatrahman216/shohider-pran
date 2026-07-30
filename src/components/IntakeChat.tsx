@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
-import type { RegistrantDTO } from "@/lib/registrant-dto";
+import type { DocumentDTO, RegistrantDTO, UploadState } from "@/lib/registrant-dto";
 import RegistrationResult from "./RegistrationResult";
 import styles from "./IntakeChat.module.css";
 
@@ -33,7 +33,7 @@ export default function IntakeChat({
   const [proposed, setProposed] = useState<ProposedRegistration | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
-  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done">("idle");
+  const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
 
   async function send() {
     const text = input.trim();
@@ -118,11 +118,12 @@ export default function IntakeChat({
 
   async function uploadDocument(file: File) {
     if (!registrant) return;
-    setUploadState("uploading");
+    setUploadState({ status: "uploading" });
     const body = new FormData();
     body.append("file", file);
-    await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
-    setUploadState("done");
+    const res = await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
+    const data = (await res.json()) as { document: DocumentDTO };
+    setUploadState({ status: "done", document: data.document });
   }
 
   if (registrant) {

@@ -21,3 +21,14 @@ export type RegistrantDTO = {
   matchedRecord: GazetteRecordDTO | null;
   candidates: CandidateDTO[];
 };
+
+export type DocumentDTO = {
+  id: string;
+  screeningStatus: "PENDING" | "SCREENED" | "SCREENING_FAILED";
+  screeningNote: string | null;
+};
+
+export type UploadState =
+  | { status: "idle" }
+  | { status: "uploading" }
+  | { status: "done"; document: DocumentDTO };

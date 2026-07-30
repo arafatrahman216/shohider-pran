@@ -60,6 +60,14 @@
   margin: 0.5rem 0 1.25rem;
 }
 
+.screeningNote {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  margin: 0 0 1rem;
+  background: var(--bg);
+}
+
 .whatsNext {
   border-top: 1px solid var(--border);
   padding-top: 1rem;
