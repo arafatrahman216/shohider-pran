@@ -96,6 +96,7 @@ model Registrant {
   stories             Story[]
   proposedPetitions   Petition[]          @relation("ProposedPetitions")
   petitionSignatures  PetitionSignature[] @relation("PetitionSignatures")
+  jobSeekerProfiles   JobSeekerProfile[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -207,4 +208,36 @@ model EscalationDraft {
   sentAt       DateTime?
 
   @@index([registrantId])
+}
+
+// Section 1 extra feature (3b, skill-to-job matching). Represents a family
+// member of a registration who is looking for work — not the registered
+// martyr/injured person themselves. Plain algorithmic matching (shared
+// district + overlapping skills), no AI involved; this isn't one of
+// Section 6's five agents.
+model JobSeekerProfile {
+  id           String     @id @default(cuid())
+  registrantId String
+  registrant   Registrant @relation(fields: [registrantId], references: [id])
+  seekerName   String
+  district     String
+  skillsCsv    String
+  contactInfo  String
+  createdAt    DateTime   @default(now())
+
+  @@index([registrantId])
+  @@index([district])
+}
+
+model JobPosting {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  district     String
+  skillsCsv    String
+  postedByName String?
+  contactInfo  String
+  createdAt    DateTime @default(now())
+
+  @@index([district])
 }
