@@ -11,6 +11,9 @@ import styles from "./RegisterWizard.module.css";
 type Category = "SHOHID" | "AHOTO";
 
 type FormState = {
+  isProxy: boolean | null;
+  proxyName: string;
+  proxyRelationship: string;
   category: Category | null;
   fullName: string;
   nid: string;
@@ -18,10 +21,34 @@ type FormState = {
   guardian: string;
 };
 
-type StepId = "category" | "fullName" | "nid" | "district" | "guardian" | "review";
-const STEPS: StepId[] = ["category", "fullName", "nid", "district", "guardian", "review"];
+type StepId =
+  | "proxy"
+  | "proxyName"
+  | "proxyRelationship"
+  | "category"
+  | "fullName"
+  | "nid"
+  | "district"
+  | "guardian"
+  | "review";
+
+function getSteps(isProxy: boolean | null): StepId[] {
+  return [
+    "proxy",
+    ...(isProxy ? (["proxyName", "proxyRelationship"] as StepId[]) : []),
+    "category",
+    "fullName",
+    "nid",
+    "district",
+    "guardian",
+    "review",
+  ];
+}
 
 const initialForm: FormState = {
+  isProxy: null,
+  proxyName: "",
+  proxyRelationship: "",
   category: null,
   fullName: "",
   nid: "",
@@ -44,11 +71,22 @@ export default function RegisterWizard({
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
 
-  const step = STEPS[stepIndex];
-  const isLast = stepIndex === STEPS.length - 1;
-  const isOptionalStep = step === "nid" || step === "guardian";
+  const steps = getSteps(form.isProxy);
+  const step = steps[stepIndex];
+  const isLast = stepIndex === steps.length - 1;
+  const isOptionalStep = step === "nid" || step === "guardian" || step === "proxyRelationship";
   const requiredStepValue =
-    step === "category" ? form.category ?? "" : step === "fullName" ? form.fullName : form.district;
+    step === "proxy"
+      ? form.isProxy === null
+        ? ""
+        : "set"
+      : step === "proxyName"
+        ? form.proxyName
+        : step === "category"
+          ? form.category ?? ""
+          : step === "fullName"
+            ? form.fullName
+            : form.district;
 
   function goNext(requireValue?: string) {
     if (requireValue !== undefined && !requireValue.trim()) {
@@ -56,7 +94,7 @@ export default function RegisterWizard({
       return;
     }
     setError(null);
-    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1));
   }
 
   function goBack() {
@@ -81,6 +119,8 @@ export default function RegisterWizard({
           district: form.district,
           nidOrBirthReg: form.nid || undefined,
           fatherOrSpouseName: form.guardian || undefined,
+          proxyName: form.isProxy ? form.proxyName || undefined : undefined,
+          proxyRelationship: form.isProxy ? form.proxyRelationship || undefined : undefined,
         }),
       });
       if (!res.ok) throw new Error("request failed");
@@ -153,13 +193,60 @@ export default function RegisterWizard({
   return (
     <div className={styles.wrapper}>
       <p className={styles.progress}>
-        {t.stepOf.replace("{current}", String(stepIndex + 1)).replace("{total}", String(STEPS.length))}
+        {t.stepOf.replace("{current}", String(stepIndex + 1)).replace("{total}", String(steps.length))}
       </p>
 
       {stepIndex === 0 && (
         <p className={styles.hint}>
           {t.switchToChat} <Link href={`/${locale}/register/chat`}>{t.switchToChatLink}</Link>
         </p>
+      )}
+
+      {step === "proxy" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxy.question}</h1>
+          <div className={styles.choices}>
+            <button
+              type="button"
+              className={`${styles.choice} ${form.isProxy === false ? styles.choiceSelected : ""}`}
+              onClick={() => setForm({ ...form, isProxy: false })}
+            >
+              {t.steps.proxy.forSelf}
+            </button>
+            <button
+              type="button"
+              className={`${styles.choice} ${form.isProxy === true ? styles.choiceSelected : ""}`}
+              onClick={() => setForm({ ...form, isProxy: true })}
+            >
+              {t.steps.proxy.forSomeoneElse}
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === "proxyName" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxyName.question}</h1>
+          <input
+            className={styles.input}
+            value={form.proxyName}
+            placeholder={t.steps.proxyName.placeholder}
+            onChange={(e) => setForm({ ...form, proxyName: e.target.value })}
+            autoFocus
+          />
+        </>
+      )}
+
+      {step === "proxyRelationship" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxyRelationship.question}</h1>
+          <input
+            className={styles.input}
+            value={form.proxyRelationship}
+            placeholder={t.steps.proxyRelationship.placeholder}
+            onChange={(e) => setForm({ ...form, proxyRelationship: e.target.value })}
+          />
+        </>
       )}
 
       {step === "category" && (
@@ -245,6 +332,15 @@ export default function RegisterWizard({
         <>
           <h1 className={`${styles.question} display`}>{t.steps.review.question}</h1>
           <div className={styles.reviewList}>
+            {form.isProxy && (
+              <div className={styles.reviewRow}>
+                <span className={styles.reviewLabel}>{t.steps.review.filedByProxy}</span>
+                <span>
+                  {form.proxyName}
+                  {form.proxyRelationship ? ` (${form.proxyRelationship})` : ""}
+                </span>
+              </div>
+            )}
             <div className={styles.reviewRow}>
               <span className={styles.reviewLabel}>{t.steps.review.category}</span>
               <span>

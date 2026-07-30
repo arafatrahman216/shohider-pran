@@ -15,6 +15,8 @@ type ProposedRegistration = {
   district: string;
   nidOrBirthReg?: string;
   fatherOrSpouseName?: string;
+  proxyName?: string;
+  proxyRelationship?: string;
 };
 
 export default function IntakeChat({
@@ -165,6 +167,15 @@ export default function IntakeChat({
           {proposed && (
             <div className={styles.confirmCard}>
               <h2 className={styles.confirmTitle}>{t.confirmTitle}</h2>
+              {proposed.proxyName && (
+                <div className={styles.confirmRow}>
+                  <span className={styles.confirmLabel}>{dict.register.steps.review.filedByProxy}</span>
+                  <span>
+                    {proposed.proxyName}
+                    {proposed.proxyRelationship ? ` (${proposed.proxyRelationship})` : ""}
+                  </span>
+                </div>
+              )}
               <div className={styles.confirmRow}>
                 <span className={styles.confirmLabel}>{dict.register.steps.review.category}</span>
                 <span>

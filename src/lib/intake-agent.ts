@@ -18,6 +18,8 @@ export type ProposedRegistration = {
   district: string;
   nidOrBirthReg?: string;
   fatherOrSpouseName?: string;
+  proxyName?: string;
+  proxyRelationship?: string;
 };
 
 export type IntakeTurnResult = {
@@ -44,6 +46,15 @@ const proposeRegistrationDeclaration: FunctionDeclaration = {
       },
       nidOrBirthReg: { type: "string", description: "National ID or birth registration number, if given" },
       fatherOrSpouseName: { type: "string", description: "Father's or spouse's name, if given" },
+      proxyName: {
+        type: "string",
+        description:
+          "The name of the person filing this registration, ONLY if they said they are filing on behalf of someone else (e.g. a neighbor or community volunteer) rather than for their own family",
+      },
+      proxyRelationship: {
+        type: "string",
+        description: "The filer's relationship to the family, if proxyName is set (e.g. neighbor, volunteer)",
+      },
     },
     required: ["category", "fullName", "district"],
   },
@@ -59,7 +70,9 @@ function systemInstruction(locale: Locale): string {
 
 ${languageLine}
 
-Conduct a short, warm, respectful interview to collect exactly these fields:
+First, ask whether the person you're talking to is registering for their own family, or on behalf of someone else (e.g. a neighbor or community volunteer helping a family who can't do this themselves). If on behalf of someone else, ask their own name and their relationship to the family (proxyName, proxyRelationship) before moving on.
+
+Then collect exactly these fields:
 1. category — is this a martyr (shohid) or an injured person (ahoto)?
 2. fullName — the full name of the person being registered
 3. district — which of Bangladesh's 64 districts they are from
@@ -111,6 +124,8 @@ export async function runIntakeTurn(
         district: args.district,
         nidOrBirthReg: typeof args.nidOrBirthReg === "string" ? args.nidOrBirthReg : undefined,
         fatherOrSpouseName: typeof args.fatherOrSpouseName === "string" ? args.fatherOrSpouseName : undefined,
+        proxyName: typeof args.proxyName === "string" ? args.proxyName : undefined,
+        proxyRelationship: typeof args.proxyRelationship === "string" ? args.proxyRelationship : undefined,
       },
     };
   }
