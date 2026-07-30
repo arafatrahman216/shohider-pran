@@ -43,5 +43,68 @@
     "guardrailAi": "No AI agent in this system ever verifies someone's status. AI drafts, screens, and summarizes — a human approves anything that leaves the system.",
     "guardrailNumbers": "Every number on this dashboard is either verified against the official record or explicitly labelled pending — never blended.",
     "rights": "Shohider Pran"
+  },
+  "register": {
+    "title": "Register a martyr or injury",
+    "stepOf": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip this question",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "errorRequired": "Please answer this question to continue.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "steps": {
+      "category": {
+        "question": "Are you registering a martyr or an injured person?",
+        "shohid": "A martyr (shohid)",
+        "ahoto": "An injured person (ahoto)"
+      },
+      "fullName": {
+        "question": "What is their full name?",
+        "placeholder": "Full name"
+      },
+      "nid": {
+        "question": "Do you have their National ID or birth registration number?",
+        "placeholder": "NID or birth registration number",
+        "hint": "Optional, but it makes an exact match far more likely."
+      },
+      "district": {
+        "question": "Which district are they from?",
+        "placeholder": "Select a district"
+      },
+      "guardian": {
+        "question": "What is their father's or spouse's name?",
+        "placeholder": "Father's or spouse's name",
+        "hint": "Optional — helps us tell apart people who share a name."
+      },
+      "review": {
+        "question": "Please review before submitting.",
+        "name": "Name",
+        "category": "Category",
+        "district": "District",
+        "nid": "NID / birth reg.",
+        "guardian": "Father's / spouse's name",
+        "notProvided": "Not provided"
+      }
+    },
+    "result": {
+      "verifiedTitle": "Matched against the official record",
+      "verifiedBody": "This registration matches an entry in the official gazette. It is now marked verified.",
+      "candidatesTitle": "We found possible matches — please confirm",
+      "candidatesBody": "These entries in the official record look similar. If one of them is who you're registering, select it to confirm. Otherwise, say none of these match and your registration stays on record as self-reported.",
+      "confirmCandidate": "Yes, this is who I'm registering",
+      "noneMatch": "None of these match",
+      "confirmed": "Confirmed as verified.",
+      "notFoundTitle": "No match found in the official record — you're registered anyway",
+      "notFoundBody": "We could not find a matching entry in the official gazette right now. Your registration is saved as self-reported and will be automatically re-checked every time the gazette is updated. You can optionally upload a supporting document for a human reviewer.",
+      "uploadLabel": "Upload a supporting document (optional)",
+      "uploadButton": "Upload",
+      "uploadedNote": "Document uploaded. A human reviewer will consider it.",
+      "trackedStatus": "You can track this registration's status any time using its ID below.",
+      "registrationId": "Registration ID",
+      "whatsNext": "What happens next",
+      "whatsNextBody": "Verified and self-reported registrations both continue to the entitlement and support process from here — a human reviews anything that needs judgment before it moves forward."
+    }
   }
 }

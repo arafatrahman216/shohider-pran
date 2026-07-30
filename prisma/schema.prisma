@@ -1,0 +1,97 @@
+// Shohider Pran — data model (Section 7 of the build plan).
+// Guardrail: verificationStatus is only ever written by the matching
+// logic (Track A/B) or a human reviewer decision — never by an AI agent.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum RecordCategory {
+  SHOHID
+  AHOTO
+}
+
+enum VerificationStatus {
+  VERIFIED
+  MATCH_PENDING_CONFIRMATION
+  UNVERIFIED_SELF_REPORTED
+  REJECTED
+}
+
+// A row scraped from an official source (Section 5). Never holds narrative/
+// copyrighted description text — factual fields only.
+model GazetteRecord {
+  id          String         @id @default(cuid())
+  name        String
+  category    RecordCategory
+  district    String?
+  fatherName  String?
+  spouseName  String?
+  nid         String?
+  sourceName  String
+  sourceUrl   String
+  needsReview Boolean        @default(false)
+  scrapedAt   DateTime       @default(now())
+
+  registrants     Registrant[]
+  matchCandidates MatchCandidate[]
+
+  @@index([name])
+  @@index([district])
+}
+
+// A person's registration (Flow A/B, Section 4). verificationStatus is the
+// single source of truth surfaced to the public dashboard — never blended
+// with unverified counts.
+model Registrant {
+  id                 String             @id @default(cuid())
+  fullName           String
+  nidOrBirthReg      String?
+  district           String
+  fatherOrSpouseName String?
+  category           RecordCategory
+  verificationStatus VerificationStatus @default(UNVERIFIED_SELF_REPORTED)
+
+  matchedRecordId String?
+  matchedRecord   GazetteRecord? @relation(fields: [matchedRecordId], references: [id])
+
+  candidates MatchCandidate[]
+  documents  Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([fullName])
+  @@index([district])
+}
+
+// Medium-confidence matches surfaced for the registrant to confirm
+// themselves (Section 4: "medium confidence shows candidate(s) to confirm").
+model MatchCandidate {
+  id              String        @id @default(cuid())
+  registrantId    String
+  registrant      Registrant    @relation(fields: [registrantId], references: [id])
+  gazetteRecordId String
+  gazetteRecord   GazetteRecord @relation(fields: [gazetteRecordId], references: [id])
+  confidence      Float
+  createdAt       DateTime      @default(now())
+
+  @@index([registrantId])
+}
+
+// Optional upload for Track B, held for later human manual review.
+model Document {
+  id           String     @id @default(cuid())
+  registrantId String
+  registrant   Registrant @relation(fields: [registrantId], references: [id])
+  fileName     String
+  fileUrl      String
+  uploadedAt   DateTime   @default(now())
+
+  @@index([registrantId])
+}

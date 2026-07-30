@@ -97,7 +97,7 @@ export default function ExtendedCalendar({
           {dict.home.calendar.sourceNote}
         </p>
         {selected === FINAL_DAY && (
-          <Link href={`/${locale}#register`} className={styles.detailCta}>
+          <Link href={`/${locale}/register`} className={styles.detailCta}>
             {dict.home.ctaPrimary}
           </Link>
         )}
