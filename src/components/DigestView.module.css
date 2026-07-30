@@ -1,0 +1,93 @@
+.wrapper {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 1.75rem;
+}
+
+.summaryCard {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  background: var(--bg-raised);
+  margin-bottom: 2rem;
+}
+
+.summaryText {
+  line-height: 1.7;
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.generatedAt {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.sectionHeading {
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 560px) {
+  .statGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+
+.statValue {
+  font-family: var(--font-mono), monospace;
+  font-size: 1.6rem;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+.districtList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.districtRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.districtCount {
+  font-family: var(--font-mono), monospace;
+  color: var(--muted);
+}

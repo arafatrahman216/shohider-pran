@@ -123,5 +123,24 @@
     "confirmTitle": "Please confirm these details",
     "confirmButton": "Confirm & submit",
     "editButton": "No, let me correct something"
+  },
+  "digest": {
+    "title": "Registry digest",
+    "subtitle": "A weekly, plain-language summary of registry activity for the dashboard and press — aggregate counts only, never individual names.",
+    "generatedAt": "Generated",
+    "noSummary": "No summary available yet — either there are no registrations yet, or the AI summarizer (GEMINI_API_KEY) isn't configured. The counts below are still live.",
+    "stats": {
+      "heading": "This week, in numbers",
+      "total": "Total registrations",
+      "verified": "Verified against the official record",
+      "pendingConfirmation": "Awaiting the registrant's confirmation",
+      "selfReported": "Self-reported, not yet in the official record",
+      "rejected": "Rejected after human review",
+      "newLast7Days": "New in the last 7 days"
+    },
+    "districts": {
+      "heading": "Most-registered districts",
+      "empty": "No registrations yet."
+    }
   }
 }
