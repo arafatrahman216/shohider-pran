@@ -65,12 +65,16 @@ model GazetteRecord {
   nid         String?
   sourceName  String
   sourceUrl   String
+  // The source's own record ID (e.g. medical_cases.id), so re-scraping the
+  // same source is an idempotent upsert instead of inserting duplicates.
+  sourceId    String?
   needsReview Boolean        @default(false)
   scrapedAt   DateTime       @default(now())
 
   registrants     Registrant[]
   matchCandidates MatchCandidate[]
 
+  @@unique([sourceName, sourceId])
   @@index([name])
   @@index([district])
 }

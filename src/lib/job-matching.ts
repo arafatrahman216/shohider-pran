@@ -1,4 +1,3 @@
-import "server-only";
 import { prisma } from "@/lib/db";
 
 // Section 1 extra feature (3b): skill-to-job matching. Plain overlap

@@ -1,4 +1,3 @@
-import "server-only";
 import { GoogleGenAI } from "@google/genai";
 
 // Foundation for Section 6's AI/agentic features (conversational intake,
