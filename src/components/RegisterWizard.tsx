@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { districts } from "@/lib/districts";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
+import type { RegistrantDTO } from "@/lib/registrant-dto";
+import RegistrationResult from "./RegistrationResult";
 import styles from "./RegisterWizard.module.css";
 
 type Category = "SHOHID" | "AHOTO";
@@ -13,26 +16,6 @@ type FormState = {
   nid: string;
   district: string;
   guardian: string;
-};
-
-type GazetteRecordDTO = {
-  id: string;
-  name: string;
-  district: string | null;
-  sourceName: string;
-};
-
-type CandidateDTO = {
-  id: string;
-  confidence: number;
-  gazetteRecord: GazetteRecordDTO;
-};
-
-type RegistrantDTO = {
-  id: string;
-  verificationStatus: "VERIFIED" | "MATCH_PENDING_CONFIRMATION" | "UNVERIFIED_SELF_REPORTED" | "REJECTED";
-  matchedRecord: GazetteRecordDTO | null;
-  candidates: CandidateDTO[];
 };
 
 type StepId = "category" | "fullName" | "nid" | "district" | "guardian" | "review";
@@ -153,67 +136,15 @@ export default function RegisterWizard({
 
   if (registrant) {
     return (
-      <div className={styles.wrapper}>
-        {registrant.verificationStatus === "VERIFIED" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.verifiedTitle}</h1>
-            <p className={styles.resultBody}>{t.result.verifiedBody}</p>
-            <div className={styles.registrationId}>
-              {t.result.registrationId}: {registrant.id}
-            </div>
-            <WhatsNext t={t} />
-          </div>
-        )}
-
-        {registrant.verificationStatus === "MATCH_PENDING_CONFIRMATION" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.candidatesTitle}</h1>
-            <p className={styles.resultBody}>{t.result.candidatesBody}</p>
-            {registrant.candidates.map((c) => (
-              <div key={c.id} className={styles.candidateCard}>
-                <strong>{c.gazetteRecord.name}</strong>
-                <p className={styles.candidateMeta}>
-                  {c.gazetteRecord.district ?? "—"} · {c.gazetteRecord.sourceName}
-                </p>
-                <button
-                  type="button"
-                  className={styles.buttonPrimary}
-                  disabled={submitting}
-                  onClick={() => confirmCandidate(c.gazetteRecord.id)}
-                >
-                  {t.result.confirmCandidate}
-                </button>
-              </div>
-            ))}
-            <button type="button" className={styles.buttonGhost} disabled={submitting} onClick={rejectCandidates}>
-              {t.result.noneMatch}
-            </button>
-          </div>
-        )}
-
-        {registrant.verificationStatus === "UNVERIFIED_SELF_REPORTED" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.notFoundTitle}</h1>
-            <p className={styles.resultBody}>{t.result.notFoundBody}</p>
-            <div className={styles.registrationId}>
-              {t.result.registrationId}: {registrant.id}
-            </div>
-            <p className={styles.reviewLabel}>{t.result.uploadLabel}</p>
-            <div className={styles.uploadRow}>
-              <input
-                type="file"
-                aria-label={t.result.uploadLabel}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) uploadDocument(file);
-                }}
-              />
-              {uploadState === "done" && <span className={styles.candidateMeta}>{t.result.uploadedNote}</span>}
-            </div>
-            <WhatsNext t={t} />
-          </div>
-        )}
-      </div>
+      <RegistrationResult
+        dict={dict}
+        registrant={registrant}
+        submitting={submitting}
+        uploadState={uploadState}
+        onConfirmCandidate={confirmCandidate}
+        onRejectCandidates={rejectCandidates}
+        onUploadFile={uploadDocument}
+      />
     );
   }
 
@@ -222,6 +153,12 @@ export default function RegisterWizard({
       <p className={styles.progress}>
         {t.stepOf.replace("{current}", String(stepIndex + 1)).replace("{total}", String(STEPS.length))}
       </p>
+
+      {stepIndex === 0 && (
+        <p className={styles.hint}>
+          {t.switchToChat} <Link href={`/${locale}/register/chat`}>{t.switchToChatLink}</Link>
+        </p>
+      )}
 
       {step === "category" && (
         <>
@@ -360,15 +297,6 @@ export default function RegisterWizard({
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function WhatsNext({ t }: { t: Dictionary["register"] }) {
-  return (
-    <div className={styles.whatsNext}>
-      <p className={styles.whatsNextTitle}>{t.result.whatsNext}</p>
-      <p className={styles.candidateMeta}>{t.result.whatsNextBody}</p>
     </div>
   );
 }
