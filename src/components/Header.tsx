@@ -37,6 +37,9 @@ export default function Header({
         <Link href={`/${locale}/petitions`} className={styles.localeLink}>
           {dict.petitions.navLabel}
         </Link>
+        <Link href={`/${locale}/jobs`} className={styles.localeLink}>
+          {dict.jobs.navLabel}
+        </Link>
         <Link href={`/${otherLocale}`} className={styles.localeLink}>
           {dict.nav.switchLocale}
         </Link>
