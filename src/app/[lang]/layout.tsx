@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "../globals.css";
 import { fontVariables } from "@/lib/fonts";
 import { themeInitScript } from "@/lib/theme-script";
 import { getDictionary, isLocale, locales, defaultLocale, type Locale } from "@/lib/dictionaries";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -21,8 +22,13 @@ export async function generateMetadata({
   return {
     title: dict.meta.title,
     description: dict.meta.description,
+    manifest: "/manifest.webmanifest",
   };
 }
+
+export const viewport: Viewport = {
+  themeColor: "#5C1A1A",
+};
 
 export default async function RootLayout({
   children,
@@ -41,6 +47,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
+        <ServiceWorkerRegister />
         <Header dict={dict} locale={locale} />
         <main id="main">{children}</main>
         <Footer dict={dict} />

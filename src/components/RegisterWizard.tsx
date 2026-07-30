@@ -13,6 +13,7 @@ import {
   subscribeDraft,
   type RegistrationDraft,
 } from "@/lib/registration-draft";
+import { queueRegistration } from "@/lib/offline-queue";
 import RegistrationResult from "./RegistrationResult";
 import styles from "./RegisterWizard.module.css";
 
@@ -79,6 +80,7 @@ export default function RegisterWizard({
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
   const [draftChoiceMade, setDraftChoiceMade] = useState(false);
+  const [queuedOffline, setQueuedOffline] = useState(false);
 
   const draftRaw = useSyncExternalStore(subscribeDraft, getDraftSnapshot, getServerDraftSnapshot);
   const draft: RegistrationDraft<FormState> | null = (() => {
@@ -148,26 +150,36 @@ export default function RegisterWizard({
     }
     setSubmitting(true);
     setError(null);
+    const payload = {
+      category: form.category,
+      fullName: form.fullName,
+      district: form.district,
+      nidOrBirthReg: form.nid || undefined,
+      fatherOrSpouseName: form.guardian || undefined,
+      proxyName: form.isProxy ? form.proxyName || undefined : undefined,
+      proxyRelationship: form.isProxy ? form.proxyRelationship || undefined : undefined,
+    };
     try {
       const res = await fetch("/api/registrants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: form.category,
-          fullName: form.fullName,
-          district: form.district,
-          nidOrBirthReg: form.nid || undefined,
-          fatherOrSpouseName: form.guardian || undefined,
-          proxyName: form.isProxy ? form.proxyName || undefined : undefined,
-          proxyRelationship: form.isProxy ? form.proxyRelationship || undefined : undefined,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("request failed");
       const data = (await res.json()) as { registrant: RegistrantDTO };
       clearDraft();
       setRegistrant(data.registrant);
-    } catch {
-      setError(t.errorGeneric);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        // A genuine network failure (offline), not an HTTP error response —
+        // save it instead of losing it, and sync automatically once back
+        // online (Section 1's offline-first requirement).
+        await queueRegistration(payload);
+        clearDraft();
+        setQueuedOffline(true);
+      } else {
+        setError(t.errorGeneric);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -213,6 +225,17 @@ export default function RegisterWizard({
     const res = await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
     const data = (await res.json()) as { document: DocumentDTO };
     setUploadState({ status: "done", document: data.document });
+  }
+
+  if (queuedOffline) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.resumeBanner}>
+          <p className={styles.question}>{t.offlineQueued.title}</p>
+          <p className={styles.hint}>{t.offlineQueued.body}</p>
+        </div>
+      </div>
+    );
   }
 
   if (registrant) {
