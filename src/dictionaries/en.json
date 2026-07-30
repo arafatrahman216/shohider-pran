@@ -134,6 +134,10 @@
       "savedAt": "Saved {date}",
       "resume": "Resume where I left off",
       "startOver": "Start over"
+    },
+    "offlineQueued": {
+      "title": "Saved on this device — no connection right now",
+      "body": "You appear to be offline. Your registration has been saved on this device and will be submitted automatically as soon as you're back online — you don't need to do anything else, even if you close this app."
     }
   },
   "intake": {
