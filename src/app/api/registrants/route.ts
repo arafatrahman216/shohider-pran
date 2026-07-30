@@ -8,6 +8,8 @@ type RegisterBody = {
   category?: "SHOHID" | "AHOTO";
   nidOrBirthReg?: string;
   fatherOrSpouseName?: string;
+  proxyName?: string;
+  proxyRelationship?: string;
 };
 
 export async function POST(request: Request) {
@@ -23,6 +25,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "category must be SHOHID or AHOTO" }, { status: 400 });
   }
 
+  const proxyName = body.proxyName?.trim() || null;
+  const proxyRelationship = body.proxyRelationship?.trim() || null;
+
   const registrant = await prisma.registrant.create({
     data: {
       fullName: body.fullName.trim(),
@@ -30,6 +35,9 @@ export async function POST(request: Request) {
       category: body.category,
       nidOrBirthReg: body.nidOrBirthReg?.trim() || null,
       fatherOrSpouseName: body.fatherOrSpouseName?.trim() || null,
+      filedByProxy: Boolean(proxyName),
+      proxyName,
+      proxyRelationship,
     },
   });
 

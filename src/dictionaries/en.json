@@ -55,6 +55,19 @@
     "errorRequired": "Please answer this question to continue.",
     "errorGeneric": "Something went wrong. Please try again.",
     "steps": {
+      "proxy": {
+        "question": "Are you filling this out for your own family, or on behalf of someone else?",
+        "forSelf": "For my own family",
+        "forSomeoneElse": "On behalf of someone else"
+      },
+      "proxyName": {
+        "question": "What is your name?",
+        "placeholder": "Your name"
+      },
+      "proxyRelationship": {
+        "question": "What is your relationship to them? (e.g. neighbor, community volunteer)",
+        "placeholder": "e.g. neighbor, community volunteer"
+      },
       "category": {
         "question": "Are you registering a martyr or an injured person?",
         "shohid": "A martyr (shohid)",
@@ -85,7 +98,8 @@
         "district": "District",
         "nid": "NID / birth reg.",
         "guardian": "Father's / spouse's name",
-        "notProvided": "Not provided"
+        "notProvided": "Not provided",
+        "filedByProxy": "Filed by"
       }
     },
     "result": {

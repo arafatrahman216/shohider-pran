@@ -91,6 +91,13 @@ model Registrant {
   category           RecordCategory
   verificationStatus VerificationStatus @default(UNVERIFIED_SELF_REPORTED)
 
+  // Proxy-fill mode (Section 1): someone other than the family — a
+  // neighbor, community volunteer — can file on their behalf. Purely
+  // informational for reviewers; never affects matching or verification.
+  filedByProxy      Boolean @default(false)
+  proxyName         String?
+  proxyRelationship String?
+
   matchedRecordId String?
   matchedRecord   GazetteRecord? @relation(fields: [matchedRecordId], references: [id])
 
