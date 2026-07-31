@@ -12,17 +12,34 @@ verification status.
 ## Getting started
 
 ```bash
-npm install
+npm install   # runs `prisma generate` automatically (postinstall) — if you
+              # ever see "Module not found: Can't resolve '@/generated/prisma/client'",
+              # this step didn't run; fix with `npx prisma generate`
 cp .env.local.example .env.local   # add GEMINI_API_KEY, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
 
-npx prisma migrate dev   # creates dev.db and applies the schema
-npx prisma db seed       # loads placeholder gazette records for local testing
+npx prisma migrate deploy   # applies the committed migrations to a fresh dev.db
+                             # (non-interactive-safe; `migrate dev` also works locally
+                             # but can hang waiting for input in some terminals)
+npx prisma db seed          # loads placeholder gazette records for local testing
 
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) — it redirects to `/bn`
 by default (`/en` for English).
+
+**A fresh clone's homepage registry counters will show 0.** `dev.db` and
+`src/generated/prisma` are both gitignored on purpose (a local build/data
+artifact and real scraped data respectively — see "Real gazette data must
+come from the scraper module" below), so neither is ever committed. The
+seed data above is placeholder-only and deliberately excluded from the
+counters (they only ever count real `medical-info.dghs.gov.bd` rows — see
+"Homepage registry counters" below). To see real numbers locally, run the
+scraper:
+
+```bash
+npm run scrape   # takes a few minutes — ~16k real records over the network
+```
 
 ```bash
 npm run test   # node's built-in test runner via tsx, no new dependency
