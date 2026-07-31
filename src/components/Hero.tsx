@@ -29,7 +29,7 @@ export default function Hero({
         <Link href={`/${locale}/register`} className={styles.ctaPrimary}>
           {dict.home.ctaPrimary}
         </Link>
-        <Link href={`/${locale}#search`} className={styles.ctaSecondary}>
+        <Link href={`/${locale}/search`} className={styles.ctaSecondary}>
           {dict.home.ctaSecondary}
         </Link>
       </div>

@@ -31,6 +31,9 @@ export default function Header({
       <nav className={styles.nav} aria-label="Primary">
         <AccessibilityToggle dict={dict.a11y} />
         <ThemeToggle dict={dict.theme} />
+        <Link href={`/${locale}/search`} className={styles.localeLink}>
+          {dict.nav.search}
+        </Link>
         <Link href={`/${locale}/stories`} className={styles.localeLink}>
           {dict.stories.navLabel}
         </Link>
