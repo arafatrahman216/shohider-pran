@@ -13,5 +13,5 @@ export default async function AdminLoginPage({
   const locale: Locale = isLocale(lang) ? lang : defaultLocale;
   const dict = await getDictionary(locale);
 
-  return <AdminLoginForm dict={dict} locale={locale} next={next ?? `/${locale}`} />;
+  return <AdminLoginForm dict={dict} locale={locale} next={next ?? `/${locale}/admin`} />;
 }

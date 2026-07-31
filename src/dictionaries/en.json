@@ -312,6 +312,24 @@
       "submitting": "Signing in…",
       "genericError": "Something went wrong. Please try again."
     },
-    "logout": "Log out"
+    "logout": "Log out",
+    "dashboard": {
+      "title": "Admin",
+      "subtitle": "Internal review tools. Nothing here is visible to the public.",
+      "registrantsReview": "Registrations awaiting manual review",
+      "registrantsReviewHint": "Track B registrations with a document uploaded, waiting on a human decision.",
+      "storiesReview": "Story translations awaiting review",
+      "storiesReviewHint": "AI-drafted bn/en translations, held until approved.",
+      "petitionsReview": "Petitions awaiting review",
+      "petitionsReviewHint": "AI-drafted collective letters, held until approved.",
+      "followUp": "Follow-up drafts",
+      "followUpHint": "Escalation notes for registrations unresolved past 45 days.",
+      "scrapeTitle": "Re-scrape the gazette",
+      "scrapeSubtitle": "Pulls the latest records from the source and re-runs auto-verification for every pending registration. Can take a few minutes.",
+      "scrapeDghs": "Re-scrape medical-info.dghs.gov.bd",
+      "scrapeJssfbd": "Re-scrape jssfbd.com",
+      "scraping": "Scraping…",
+      "scrapeResult": "Done."
+    }
   }
 }
