@@ -91,7 +91,12 @@ export default function RegisterWizard({
       return null;
     }
   })();
-  const showResumeBanner = Boolean(draft) && !draftChoiceMade;
+  // Purely derived from form/stepIndex (not from draftRaw) so it can never
+  // lag a step behind: the moment the user has made any progress in *this*
+  // mount, a resume banner must never appear again, even for the instant
+  // between a step change and the autosave effect below catching up.
+  const userHasInteracted = stepIndex > 0 || JSON.stringify(form) !== JSON.stringify(initialForm);
+  const showResumeBanner = Boolean(draft) && !draftChoiceMade && !userHasInteracted;
 
   useEffect(() => {
     if (showResumeBanner) return;
