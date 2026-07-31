@@ -6,7 +6,8 @@
   "nav": {
     "brand": "Shohider Pran",
     "switchLocale": "বাংলা",
-    "register": "Register"
+    "register": "Register",
+    "search": "Search"
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -302,6 +303,20 @@
     "boardEmpty": "No open opportunities yet.",
     "errorRequired": "Please fill in all fields.",
     "errorGeneric": "Something went wrong. Please try again."
+  },
+  "search": {
+    "title": "Search the registry",
+    "subtitle": "Search verified entries from the official record by name or district. This only searches verified records — a self-reported registration that hasn't been matched yet won't appear here.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Search by name",
+    "districtLabel": "District",
+    "districtPlaceholder": "All districts",
+    "searchButton": "Search",
+    "searching": "Searching…",
+    "emptyPrompt": "Enter a name or choose a district to search.",
+    "noResults": "No verified matches found. If you believe someone is missing from the record, you can register them — self-reported entries are automatically re-checked whenever the record updates.",
+    "resultCategory": "Category",
+    "registerCta": "Register someone who isn't listed"
   },
   "admin": {
     "login": {
