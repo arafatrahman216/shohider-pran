@@ -24,6 +24,13 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) — it redirects to `/bn`
 by default (`/en` for English).
 
+```bash
+npm run test   # node's built-in test runner via tsx, no new dependency
+```
+
+Currently covers `scoreMatch` in `src/lib/matching.ts` — the pure scoring
+logic behind the only code path allowed to write `verificationStatus`.
+
 ## Notes for this codebase
 
 - **This is not the Next.js you know.** This project runs Next.js 16, which
@@ -49,8 +56,9 @@ by default (`/en` for English).
 ## Admin / internal review tools
 
 `/[lang]/stories/review`, `/[lang]/petitions/review`, `/[lang]/follow-up`,
-and the two `POST /api/scrape/*` triggers are internal-only — approving an
-AI-drafted story/petition translation, sending a follow-up escalation, or
+`/[lang]/registrants/review`, and the two `POST /api/scrape/*` triggers are
+internal-only — approving an AI-drafted story/petition translation, sending
+a follow-up escalation, deciding a Track B registration by hand, or
 re-scraping the gazette are all actions a human reviewer takes, never
 end users. They sit behind a single shared admin password:
 
@@ -67,6 +75,21 @@ end users. They sit behind a single shared admin password:
 
 There's no multi-user account system here — this is a single shared
 password for whoever's doing review work, not per-admin accounts.
+
+`/[lang]/registrants/review` (`src/components/RegistrantReviewView.tsx`,
+backed by `adminVerifyRegistrant`/`adminRejectRegistrant` in
+`src/lib/matching.ts`) is Section 2's "optional document upload for later
+manual review" queue: every `UNVERIFIED_SELF_REPORTED` registrant, their
+uploaded document(s), and the AI pre-screening agent's advisory note, with
+Verify/Reject buttons. The AI note is only ever input to a human's decision
+— it never sets `verificationStatus` itself, same guardrail as every other
+agent in this app.
+
+`POST /api/admin/login` and the public `POST /api/registrants` and
+`POST /api/intake/chat` endpoints are rate-limited per IP
+(`src/lib/rate-limit.ts` — in-memory, no new dependency; fine for a single
+Node server, would need a shared store like Redis behind a multi-instance
+deployment).
 
 ## Scraper (Section 5)
 
@@ -98,6 +121,16 @@ credential if you need to automate this outside a browser.
   bypassing certificate verification.
 - **july36.gov.bd** — currently just a splash/coming-soon page, no list
   content to scrape yet.
+
+**Scheduled re-scraping** — Section 5 point 6 calls for re-running the
+scraper on a schedule. `vercel.json` defines a daily Vercel Cron job hitting
+`GET /api/cron/rescrape` (`src/app/api/cron/rescrape/route.ts`), which runs
+both scrapers plus `reverifyAllPending()`. This route sits outside the admin
+cookie gate (the scheduler has no browser session) and instead checks
+`Authorization: Bearer $CRON_SECRET` — Vercel sets that header itself when
+`CRON_SECRET` is configured on the project; without it, the route refuses
+every request. On another host, hit the same route on your own schedule
+(cron, systemd timer, etc.) with that header set.
 
 ## Learn more
 

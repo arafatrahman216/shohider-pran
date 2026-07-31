@@ -2,17 +2,31 @@ import { NextResponse } from "next/server";
 import { isGeminiConfigured } from "@/lib/gemini";
 import { runIntakeTurn, type IntakeMessage } from "@/lib/intake-agent";
 import { isLocale } from "@/lib/dictionaries";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 type ChatBody = {
   locale?: string;
   messages?: IntakeMessage[];
 };
 
+// Every turn is a real Gemini API call — this endpoint is the most
+// cost-sensitive public route in the app, so it gets the tightest limit.
+const CHAT_TURN_LIMIT = 30;
+const CHAT_WINDOW_MS = 10 * 60 * 1000;
+
 export async function POST(request: Request) {
   if (!isGeminiConfigured()) {
     return NextResponse.json(
       { error: "The conversational intake assistant is not configured (GEMINI_API_KEY is unset)." },
       { status: 503 }
+    );
+  }
+
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`intake-chat:${ip}`, CHAT_TURN_LIMIT, CHAT_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many messages sent recently. Please wait a moment and try again." },
+      { status: 429 }
     );
   }
 

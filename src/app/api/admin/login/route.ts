@@ -5,12 +5,24 @@ import {
   createAdminSessionToken,
   isAdminAuthConfigured,
 } from "@/lib/admin-auth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+const LOGIN_ATTEMPT_LIMIT = 10;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
   if (!isAdminAuthConfigured()) {
     return NextResponse.json(
       { error: "Admin login is not configured on this server." },
       { status: 503 }
+    );
+  }
+
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`admin-login:${ip}`, LOGIN_ATTEMPT_LIMIT, LOGIN_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many login attempts. Try again later." },
+      { status: 429 }
     );
   }
 

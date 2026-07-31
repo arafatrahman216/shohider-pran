@@ -168,6 +168,36 @@ export async function rejectAllCandidates(registrantId: string) {
   });
 }
 
+// A human reviewer's decision on a Track B registrant after reading their
+// uploaded document(s) and the AI pre-screening agent's advisory note —
+// Section 2's "optional document upload for later manual review." Like
+// confirmCandidate/rejectAllCandidates above, this is a human writing
+// verificationStatus directly; the AI screening note is only ever input to
+// that decision, never the decision itself.
+export async function adminVerifyRegistrant(registrantId: string) {
+  const registrant = await prisma.registrant.findUnique({ where: { id: registrantId } });
+  if (!registrant) {
+    throw new Error("Registrant not found");
+  }
+  await prisma.matchCandidate.deleteMany({ where: { registrantId } });
+  await prisma.registrant.update({
+    where: { id: registrantId },
+    data: { verificationStatus: "VERIFIED" },
+  });
+}
+
+export async function adminRejectRegistrant(registrantId: string) {
+  const registrant = await prisma.registrant.findUnique({ where: { id: registrantId } });
+  if (!registrant) {
+    throw new Error("Registrant not found");
+  }
+  await prisma.matchCandidate.deleteMany({ where: { registrantId } });
+  await prisma.registrant.update({
+    where: { id: registrantId },
+    data: { verificationStatus: "REJECTED" },
+  });
+}
+
 // Re-run matching for every registrant not yet verified — Section 2's
 // "auto-re-verification whenever the gazette updates."
 export async function reverifyAllPending(): Promise<{ upgraded: number; total: number }> {
