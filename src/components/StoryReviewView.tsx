@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/dictionaries";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
 import styles from "./StoryReviewView.module.css";
 
 type ReviewStory = {
@@ -46,6 +47,9 @@ export default function StoryReviewView({ dict }: { dict: Dictionary }) {
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.adminBar}>
+        <AdminLogoutButton label={dict.admin.logout} />
+      </div>
       <h1 className={`${styles.title} display`}>{t.reviewTitle}</h1>
       <p className={styles.subtitle}>{t.reviewSubtitle}</p>
 

@@ -2,13 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Dictionary } from "@/lib/dictionaries";
+import type { DghsRegistryCounts } from "@/lib/registry-stats";
 import styles from "./RegistryCounters.module.css";
-
-const STATS = [
-  { key: "martyrs", target: 8200 },
-  { key: "injured", target: 118500 },
-  { key: "families", target: 250000 },
-] as const;
 
 const DURATION_MS = 1400;
 
@@ -35,7 +30,13 @@ function useCountUp(target: number, active: boolean) {
   return value;
 }
 
-export default function RegistryCounters({ dict }: { dict: Dictionary }) {
+export default function RegistryCounters({
+  dict,
+  counts,
+}: {
+  dict: Dictionary;
+  counts: DghsRegistryCounts;
+}) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(false);
 
@@ -56,12 +57,16 @@ export default function RegistryCounters({ dict }: { dict: Dictionary }) {
   }, []);
 
   const formatter = new Intl.NumberFormat("en-US");
+  const stats = [
+    { key: "martyrs" as const, target: counts.martyrs },
+    { key: "injured" as const, target: counts.injured },
+  ];
 
   return (
     <section className={styles.section} ref={ref}>
       <h2 className={styles.heading}>{dict.home.counters.heading}</h2>
       <div className={styles.grid}>
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <Counter
             key={stat.key}
             target={stat.target}
@@ -90,7 +95,7 @@ function Counter({
   const value = useCountUp(target, active);
   return (
     <div className={styles.stat}>
-      <div className={styles.value}>{formatter.format(value)}+</div>
+      <div className={styles.value}>{formatter.format(value)}</div>
       <div className={styles.label}>{label}</div>
     </div>
   );

@@ -4,6 +4,12 @@
   padding: 3rem 1.5rem 5rem;
 }
 
+.adminBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
 .title {
   font-size: 1.6rem;
   margin: 0 0 0.5rem;
