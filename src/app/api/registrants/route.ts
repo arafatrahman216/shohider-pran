@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { runMatching } from "@/lib/matching";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 type RegisterBody = {
   fullName?: string;
@@ -12,7 +13,21 @@ type RegisterBody = {
   proxyRelationship?: string;
 };
 
+// Generous enough for a family or a volunteer filing several relatives'
+// registrations from the same connection, tight enough to blunt scripted
+// spam of this public, unauthenticated endpoint.
+const SUBMIT_LIMIT = 20;
+const SUBMIT_WINDOW_MS = 60 * 60 * 1000;
+
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(`register:${ip}`, SUBMIT_LIMIT, SUBMIT_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many registrations from this connection. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const body = (await request.json()) as RegisterBody;
 
   if (!body.fullName?.trim() || !body.district?.trim() || !body.category) {

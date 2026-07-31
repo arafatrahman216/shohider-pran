@@ -12,7 +12,12 @@ function getLocale(request: NextRequest): string {
 
 // Internal review tools (Section 6/8: AI drafts stories/petitions/escalations,
 // a human must approve before anything goes out) — never public.
-const ADMIN_PAGE_PATHS = ["/stories/review", "/petitions/review", "/follow-up"];
+const ADMIN_PAGE_PATHS = [
+  "/stories/review",
+  "/petitions/review",
+  "/follow-up",
+  "/registrants/review",
+];
 
 function hasAdminSession(request: NextRequest): boolean {
   return verifyAdminSessionToken(request.cookies.get(ADMIN_SESSION_COOKIE)?.value);
@@ -63,5 +68,8 @@ export const config = {
     "/api/follow-up/scan",
     "/api/follow-up/:id/send",
     "/api/scrape/:path*",
+    "/api/admin/registrants/:path*",
+    "/api/registrants/:id/admin-verify",
+    "/api/registrants/:id/admin-reject",
   ],
 };

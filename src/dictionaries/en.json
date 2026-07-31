@@ -187,6 +187,25 @@
     "sending": "Sending…",
     "sentNote": "This app has no outbound email/SMS integration yet — this only records that a human handled it."
   },
+  "registrantReview": {
+    "title": "Registrations awaiting manual review",
+    "subtitle": "Track B registrations with no official-record match yet. Any uploaded document and the AI pre-screening agent's advisory note are shown below — the decision to verify or reject is always a human reviewer's, never the AI's.",
+    "empty": "No registrations waiting for manual review.",
+    "registrationId": "Registration ID",
+    "district": "District",
+    "category": "Category",
+    "proxyFiled": "Filed by proxy: {name} ({relationship})",
+    "documentsLabel": "Uploaded documents",
+    "noDocuments": "No documents uploaded.",
+    "viewDocument": "View document",
+    "screeningPending": "AI pre-screening not yet run.",
+    "screeningFailed": "AI pre-screening failed to run — review the document directly.",
+    "screeningNoteLabel": "AI pre-screening note (advisory only)",
+    "verifyButton": "Verify",
+    "verifying": "Verifying…",
+    "rejectButton": "Reject",
+    "rejecting": "Rejecting…"
+  },
   "stories": {
     "navLabel": "Amar Golpo",
     "publicTitle": "Amar Golpo — their stories, in their families' words",
