@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/db";
+import { screenDocument } from "@/lib/document-screening-agent";
 
 const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
@@ -47,5 +48,16 @@ export async function POST(
     },
   });
 
-  return NextResponse.json({ document }, { status: 201 });
+  // Best-effort: pre-screening is advisory only, so a failure here should
+  // never fail the upload itself (screenDocument already catches its own
+  // errors and records SCREENING_FAILED, this guards the isGeminiConfigured
+  // no-op path plus anything unexpected).
+  try {
+    await screenDocument(document.id);
+  } catch {
+    // already recorded by screenDocument; nothing further to do here
+  }
+
+  const withScreening = await prisma.document.findUniqueOrThrow({ where: { id: document.id } });
+  return NextResponse.json({ document: withScreening }, { status: 201 });
 }

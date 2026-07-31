@@ -23,6 +23,36 @@ enum VerificationStatus {
   REJECTED
 }
 
+// Section 6's document pre-screening agent only ever produces an advisory
+// note for a human reviewer — SCREENED never implies approved or rejected,
+// only that the AI has left a note for the reviewer to read.
+enum ScreeningStatus {
+  PENDING
+  SCREENED
+  SCREENING_FAILED
+}
+
+// Section 6's proactive follow-up agent only ever produces a draft — moving
+// to SENT requires an explicit human (admin) action, never an automatic one.
+enum EscalationStatus {
+  DRAFT
+  SENT
+}
+
+enum Locale {
+  BN
+  EN
+}
+
+// Section 1 extra feature (3d, collective letter/petition generator). AI
+// drafts the letter text; it stays DRAFT (not signable, not public) until a
+// human admin explicitly approves it.
+enum PetitionStatus {
+  DRAFT
+  APPROVED
+  CLOSED
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -35,12 +65,16 @@ model GazetteRecord {
   nid         String?
   sourceName  String
   sourceUrl   String
+  // The source's own record ID (e.g. medical_cases.id), so re-scraping the
+  // same source is an idempotent upsert instead of inserting duplicates.
+  sourceId    String?
   needsReview Boolean        @default(false)
   scrapedAt   DateTime       @default(now())
 
   registrants     Registrant[]
   matchCandidates MatchCandidate[]
 
+  @@unique([sourceName, sourceId])
   @@index([name])
   @@index([district])
 }
@@ -57,11 +91,23 @@ model Registrant {
   category           RecordCategory
   verificationStatus VerificationStatus @default(UNVERIFIED_SELF_REPORTED)
 
+  // Proxy-fill mode (Section 1): someone other than the family — a
+  // neighbor, community volunteer — can file on their behalf. Purely
+  // informational for reviewers; never affects matching or verification.
+  filedByProxy      Boolean @default(false)
+  proxyName         String?
+  proxyRelationship String?
+
   matchedRecordId String?
   matchedRecord   GazetteRecord? @relation(fields: [matchedRecordId], references: [id])
 
-  candidates MatchCandidate[]
-  documents  Document[]
+  candidates          MatchCandidate[]
+  documents           Document[]
+  escalationDrafts    EscalationDraft[]
+  stories             Story[]
+  proposedPetitions   Petition[]          @relation("ProposedPetitions")
+  petitionSignatures  PetitionSignature[] @relation("PetitionSignatures")
+  jobSeekerProfiles   JobSeekerProfile[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,5 +139,116 @@ model Document {
   fileUrl      String
   uploadedAt   DateTime   @default(now())
 
+  // Document pre-screening agent (Section 6) output — advisory only, never
+  // a verification decision. Left null until the agent runs (or forever, if
+  // GEMINI_API_KEY is unset).
+  screeningStatus ScreeningStatus @default(PENDING)
+  screeningNote   String?
+  screenedAt      DateTime?
+
   @@index([registrantId])
+}
+
+// Amar Golpo (Section 1 extra feature 3a) — a family member's memorial
+// story for a registrant. Submitted in one language; the multilingual sync
+// agent (Section 6) drafts the other language, always flagged for review
+// and never auto-published. The submitted language is trusted at
+// submission (it's the family's own words, not AI content) — only the
+// AI-drafted translation needs a reviewed flag before it can be shown.
+model Story {
+  id             String   @id @default(cuid())
+  registrantId   String
+  registrant     Registrant @relation(fields: [registrantId], references: [id])
+  authorName     String?
+  originalLocale Locale
+  bodyBn         String?
+  bodyEn         String?
+  bnReviewed     Boolean  @default(false)
+  enReviewed     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([registrantId])
+}
+
+// Section 1 extra feature (3d) — a collective letter/petition. The AI
+// drafts formal letter text from the proposer's stated cause; it cannot be
+// signed or shown publicly until an admin approves it. Signatures are tied
+// to real Registrant IDs only — no anonymous or free-text names — so signer
+// counts can't be inflated or fabricated.
+model Petition {
+  id           String         @id @default(cuid())
+  title        String
+  ask          String
+  draftText    String?
+  status       PetitionStatus @default(DRAFT)
+  proposedById String
+  proposedBy   Registrant     @relation("ProposedPetitions", fields: [proposedById], references: [id])
+  createdAt    DateTime       @default(now())
+  approvedAt   DateTime?
+
+  signatures PetitionSignature[]
+
+  @@index([proposedById])
+}
+
+model PetitionSignature {
+  id           String     @id @default(cuid())
+  petitionId   String
+  petition     Petition   @relation(fields: [petitionId], references: [id])
+  registrantId String
+  registrant   Registrant @relation("PetitionSignatures", fields: [registrantId], references: [id])
+  signedAt     DateTime   @default(now())
+
+  @@unique([petitionId, registrantId])
+  @@index([petitionId])
+}
+
+// Section 6's proactive follow-up agent output for a registrant whose
+// verification has stayed open past a threshold. Drafts only — an admin
+// must explicitly mark one SENT before anything leaves the system, and even
+// then this app has no outbound email/SMS integration: SENT just records
+// that a human handled it, not that a message was automatically delivered.
+model EscalationDraft {
+  id           String           @id @default(cuid())
+  registrantId String
+  registrant   Registrant       @relation(fields: [registrantId], references: [id])
+  draftText    String
+  status       EscalationStatus @default(DRAFT)
+  createdAt    DateTime         @default(now())
+  sentAt       DateTime?
+
+  @@index([registrantId])
+}
+
+// Section 1 extra feature (3b, skill-to-job matching). Represents a family
+// member of a registration who is looking for work — not the registered
+// martyr/injured person themselves. Plain algorithmic matching (shared
+// district + overlapping skills), no AI involved; this isn't one of
+// Section 6's five agents.
+model JobSeekerProfile {
+  id           String     @id @default(cuid())
+  registrantId String
+  registrant   Registrant @relation(fields: [registrantId], references: [id])
+  seekerName   String
+  district     String
+  skillsCsv    String
+  contactInfo  String
+  createdAt    DateTime   @default(now())
+
+  @@index([registrantId])
+  @@index([district])
+}
+
+model JobPosting {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  district     String
+  skillsCsv    String
+  postedByName String?
+  contactInfo  String
+  createdAt    DateTime @default(now())
+
+  @@index([district])
 }

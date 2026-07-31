@@ -1,13 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { districts } from "@/lib/districts";
 import type { Dictionary, Locale } from "@/lib/dictionaries";
+import type { DocumentDTO, RegistrantDTO, UploadState } from "@/lib/registrant-dto";
+import {
+  clearDraft,
+  getDraftSnapshot,
+  getServerDraftSnapshot,
+  saveDraft,
+  subscribeDraft,
+  type RegistrationDraft,
+} from "@/lib/registration-draft";
+import { queueRegistration } from "@/lib/offline-queue";
+import RegistrationResult from "./RegistrationResult";
 import styles from "./RegisterWizard.module.css";
 
 type Category = "SHOHID" | "AHOTO";
 
 type FormState = {
+  isProxy: boolean | null;
+  proxyName: string;
+  proxyRelationship: string;
   category: Category | null;
   fullName: string;
   nid: string;
@@ -15,30 +30,34 @@ type FormState = {
   guardian: string;
 };
 
-type GazetteRecordDTO = {
-  id: string;
-  name: string;
-  district: string | null;
-  sourceName: string;
-};
+type StepId =
+  | "proxy"
+  | "proxyName"
+  | "proxyRelationship"
+  | "category"
+  | "fullName"
+  | "nid"
+  | "district"
+  | "guardian"
+  | "review";
 
-type CandidateDTO = {
-  id: string;
-  confidence: number;
-  gazetteRecord: GazetteRecordDTO;
-};
-
-type RegistrantDTO = {
-  id: string;
-  verificationStatus: "VERIFIED" | "MATCH_PENDING_CONFIRMATION" | "UNVERIFIED_SELF_REPORTED" | "REJECTED";
-  matchedRecord: GazetteRecordDTO | null;
-  candidates: CandidateDTO[];
-};
-
-type StepId = "category" | "fullName" | "nid" | "district" | "guardian" | "review";
-const STEPS: StepId[] = ["category", "fullName", "nid", "district", "guardian", "review"];
+function getSteps(isProxy: boolean | null): StepId[] {
+  return [
+    "proxy",
+    ...(isProxy ? (["proxyName", "proxyRelationship"] as StepId[]) : []),
+    "category",
+    "fullName",
+    "nid",
+    "district",
+    "guardian",
+    "review",
+  ];
+}
 
 const initialForm: FormState = {
+  isProxy: null,
+  proxyName: "",
+  proxyRelationship: "",
   category: null,
   fullName: "",
   nid: "",
@@ -59,13 +78,56 @@ export default function RegisterWizard({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [registrant, setRegistrant] = useState<RegistrantDTO | null>(null);
-  const [uploadState, setUploadState] = useState<"idle" | "uploading" | "done">("idle");
+  const [uploadState, setUploadState] = useState<UploadState>({ status: "idle" });
+  const [draftChoiceMade, setDraftChoiceMade] = useState(false);
+  const [queuedOffline, setQueuedOffline] = useState(false);
 
-  const step = STEPS[stepIndex];
-  const isLast = stepIndex === STEPS.length - 1;
-  const isOptionalStep = step === "nid" || step === "guardian";
+  const draftRaw = useSyncExternalStore(subscribeDraft, getDraftSnapshot, getServerDraftSnapshot);
+  const draft: RegistrationDraft<FormState> | null = (() => {
+    if (!draftRaw) return null;
+    try {
+      return JSON.parse(draftRaw) as RegistrationDraft<FormState>;
+    } catch {
+      return null;
+    }
+  })();
+  const showResumeBanner = Boolean(draft) && !draftChoiceMade;
+
+  useEffect(() => {
+    if (showResumeBanner) return;
+    if (JSON.stringify(form) === JSON.stringify(initialForm) && stepIndex === 0) return;
+    saveDraft(form, stepIndex);
+  }, [form, stepIndex, showResumeBanner]);
+
+  function resumeDraft() {
+    if (draft) {
+      setForm(draft.form);
+      setStepIndex(draft.stepIndex);
+    }
+    setDraftChoiceMade(true);
+  }
+
+  function discardDraft() {
+    clearDraft();
+    setDraftChoiceMade(true);
+  }
+
+  const steps = getSteps(form.isProxy);
+  const step = steps[stepIndex];
+  const isLast = stepIndex === steps.length - 1;
+  const isOptionalStep = step === "nid" || step === "guardian" || step === "proxyRelationship";
   const requiredStepValue =
-    step === "category" ? form.category ?? "" : step === "fullName" ? form.fullName : form.district;
+    step === "proxy"
+      ? form.isProxy === null
+        ? ""
+        : "set"
+      : step === "proxyName"
+        ? form.proxyName
+        : step === "category"
+          ? form.category ?? ""
+          : step === "fullName"
+            ? form.fullName
+            : form.district;
 
   function goNext(requireValue?: string) {
     if (requireValue !== undefined && !requireValue.trim()) {
@@ -73,7 +135,7 @@ export default function RegisterWizard({
       return;
     }
     setError(null);
-    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1));
   }
 
   function goBack() {
@@ -88,23 +150,36 @@ export default function RegisterWizard({
     }
     setSubmitting(true);
     setError(null);
+    const payload = {
+      category: form.category,
+      fullName: form.fullName,
+      district: form.district,
+      nidOrBirthReg: form.nid || undefined,
+      fatherOrSpouseName: form.guardian || undefined,
+      proxyName: form.isProxy ? form.proxyName || undefined : undefined,
+      proxyRelationship: form.isProxy ? form.proxyRelationship || undefined : undefined,
+    };
     try {
       const res = await fetch("/api/registrants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: form.category,
-          fullName: form.fullName,
-          district: form.district,
-          nidOrBirthReg: form.nid || undefined,
-          fatherOrSpouseName: form.guardian || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("request failed");
       const data = (await res.json()) as { registrant: RegistrantDTO };
+      clearDraft();
       setRegistrant(data.registrant);
-    } catch {
-      setError(t.errorGeneric);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        // A genuine network failure (offline), not an HTTP error response —
+        // save it instead of losing it, and sync automatically once back
+        // online (Section 1's offline-first requirement).
+        await queueRegistration(payload);
+        clearDraft();
+        setQueuedOffline(true);
+      } else {
+        setError(t.errorGeneric);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -144,75 +219,57 @@ export default function RegisterWizard({
 
   async function uploadDocument(file: File) {
     if (!registrant) return;
-    setUploadState("uploading");
+    setUploadState({ status: "uploading" });
     const body = new FormData();
     body.append("file", file);
-    await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
-    setUploadState("done");
+    const res = await fetch(`/api/registrants/${registrant.id}/documents`, { method: "POST", body });
+    const data = (await res.json()) as { document: DocumentDTO };
+    setUploadState({ status: "done", document: data.document });
+  }
+
+  if (queuedOffline) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.resumeBanner}>
+          <p className={styles.question}>{t.offlineQueued.title}</p>
+          <p className={styles.hint}>{t.offlineQueued.body}</p>
+        </div>
+      </div>
+    );
   }
 
   if (registrant) {
     return (
-      <div className={styles.wrapper}>
-        {registrant.verificationStatus === "VERIFIED" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.verifiedTitle}</h1>
-            <p className={styles.resultBody}>{t.result.verifiedBody}</p>
-            <div className={styles.registrationId}>
-              {t.result.registrationId}: {registrant.id}
-            </div>
-            <WhatsNext t={t} />
-          </div>
-        )}
+      <RegistrationResult
+        dict={dict}
+        locale={locale}
+        registrant={registrant}
+        submitting={submitting}
+        uploadState={uploadState}
+        onConfirmCandidate={confirmCandidate}
+        onRejectCandidates={rejectCandidates}
+        onUploadFile={uploadDocument}
+      />
+    );
+  }
 
-        {registrant.verificationStatus === "MATCH_PENDING_CONFIRMATION" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.candidatesTitle}</h1>
-            <p className={styles.resultBody}>{t.result.candidatesBody}</p>
-            {registrant.candidates.map((c) => (
-              <div key={c.id} className={styles.candidateCard}>
-                <strong>{c.gazetteRecord.name}</strong>
-                <p className={styles.candidateMeta}>
-                  {c.gazetteRecord.district ?? "—"} · {c.gazetteRecord.sourceName}
-                </p>
-                <button
-                  type="button"
-                  className={styles.buttonPrimary}
-                  disabled={submitting}
-                  onClick={() => confirmCandidate(c.gazetteRecord.id)}
-                >
-                  {t.result.confirmCandidate}
-                </button>
-              </div>
-            ))}
-            <button type="button" className={styles.buttonGhost} disabled={submitting} onClick={rejectCandidates}>
-              {t.result.noneMatch}
+  if (showResumeBanner && draft) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.resumeBanner}>
+          <p className={styles.question}>{t.draft.question}</p>
+          <p className={styles.hint}>
+            {t.draft.savedAt.replace("{date}", new Date(draft.savedAt).toLocaleString())}
+          </p>
+          <div className={styles.actions}>
+            <button type="button" className={styles.buttonSecondary} onClick={discardDraft}>
+              {t.draft.startOver}
+            </button>
+            <button type="button" className={styles.buttonPrimary} onClick={resumeDraft}>
+              {t.draft.resume}
             </button>
           </div>
-        )}
-
-        {registrant.verificationStatus === "UNVERIFIED_SELF_REPORTED" && (
-          <div className={styles.resultCard}>
-            <h1 className={`${styles.resultTitle} display`}>{t.result.notFoundTitle}</h1>
-            <p className={styles.resultBody}>{t.result.notFoundBody}</p>
-            <div className={styles.registrationId}>
-              {t.result.registrationId}: {registrant.id}
-            </div>
-            <p className={styles.reviewLabel}>{t.result.uploadLabel}</p>
-            <div className={styles.uploadRow}>
-              <input
-                type="file"
-                aria-label={t.result.uploadLabel}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) uploadDocument(file);
-                }}
-              />
-              {uploadState === "done" && <span className={styles.candidateMeta}>{t.result.uploadedNote}</span>}
-            </div>
-            <WhatsNext t={t} />
-          </div>
-        )}
+        </div>
       </div>
     );
   }
@@ -220,8 +277,61 @@ export default function RegisterWizard({
   return (
     <div className={styles.wrapper}>
       <p className={styles.progress}>
-        {t.stepOf.replace("{current}", String(stepIndex + 1)).replace("{total}", String(STEPS.length))}
+        {t.stepOf.replace("{current}", String(stepIndex + 1)).replace("{total}", String(steps.length))}
       </p>
+
+      {stepIndex === 0 && (
+        <p className={styles.hint}>
+          {t.switchToChat} <Link href={`/${locale}/register/chat`}>{t.switchToChatLink}</Link>
+        </p>
+      )}
+
+      {step === "proxy" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxy.question}</h1>
+          <div className={styles.choices}>
+            <button
+              type="button"
+              className={`${styles.choice} ${form.isProxy === false ? styles.choiceSelected : ""}`}
+              onClick={() => setForm({ ...form, isProxy: false })}
+            >
+              {t.steps.proxy.forSelf}
+            </button>
+            <button
+              type="button"
+              className={`${styles.choice} ${form.isProxy === true ? styles.choiceSelected : ""}`}
+              onClick={() => setForm({ ...form, isProxy: true })}
+            >
+              {t.steps.proxy.forSomeoneElse}
+            </button>
+          </div>
+        </>
+      )}
+
+      {step === "proxyName" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxyName.question}</h1>
+          <input
+            className={styles.input}
+            value={form.proxyName}
+            placeholder={t.steps.proxyName.placeholder}
+            onChange={(e) => setForm({ ...form, proxyName: e.target.value })}
+            autoFocus
+          />
+        </>
+      )}
+
+      {step === "proxyRelationship" && (
+        <>
+          <h1 className={`${styles.question} display`}>{t.steps.proxyRelationship.question}</h1>
+          <input
+            className={styles.input}
+            value={form.proxyRelationship}
+            placeholder={t.steps.proxyRelationship.placeholder}
+            onChange={(e) => setForm({ ...form, proxyRelationship: e.target.value })}
+          />
+        </>
+      )}
 
       {step === "category" && (
         <>
@@ -306,6 +416,15 @@ export default function RegisterWizard({
         <>
           <h1 className={`${styles.question} display`}>{t.steps.review.question}</h1>
           <div className={styles.reviewList}>
+            {form.isProxy && (
+              <div className={styles.reviewRow}>
+                <span className={styles.reviewLabel}>{t.steps.review.filedByProxy}</span>
+                <span>
+                  {form.proxyName}
+                  {form.proxyRelationship ? ` (${form.proxyRelationship})` : ""}
+                </span>
+              </div>
+            )}
             <div className={styles.reviewRow}>
               <span className={styles.reviewLabel}>{t.steps.review.category}</span>
               <span>
@@ -360,15 +479,6 @@ export default function RegisterWizard({
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function WhatsNext({ t }: { t: Dictionary["register"] }) {
-  return (
-    <div className={styles.whatsNext}>
-      <p className={styles.whatsNextTitle}>{t.result.whatsNext}</p>
-      <p className={styles.candidateMeta}>{t.result.whatsNextBody}</p>
     </div>
   );
 }

@@ -4,6 +4,13 @@
   padding: 3rem 1.5rem 5rem;
 }
 
+.resumeBanner {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  background: var(--bg-raised);
+}
+
 .progress {
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
@@ -137,67 +144,4 @@
 
 .reviewLabel {
   color: var(--muted);
-}
-
-.resultCard {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  background: var(--bg-raised);
-}
-
-.resultTitle {
-  margin: 0 0 0.75rem;
-  font-size: 1.3rem;
-}
-
-.resultBody {
-  line-height: 1.6;
-  font-size: 0.95rem;
-  margin: 0 0 1rem;
-}
-
-.candidateCard {
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.candidateMeta {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin: 0.3rem 0 0.75rem;
-}
-
-.registrationId {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.85rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.7rem;
-  display: inline-block;
-  margin: 0.5rem 0 1.25rem;
-  word-break: break-all;
-}
-
-.uploadRow {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-  flex-wrap: wrap;
-  margin: 0.5rem 0 1.25rem;
-}
-
-.whatsNext {
-  border-top: 1px solid var(--border);
-  padding-top: 1rem;
-  margin-top: 1rem;
-}
-
-.whatsNextTitle {
-  font-weight: 600;
-  margin: 0 0 0.4rem;
-  font-size: 0.9rem;
 }
