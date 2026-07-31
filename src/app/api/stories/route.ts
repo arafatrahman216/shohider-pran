@@ -39,8 +39,9 @@ export async function POST(request: Request) {
       originalLocale: locale === "bn" ? "BN" : "EN",
       bodyBn: locale === "bn" ? body.body.trim() : null,
       bodyEn: locale === "en" ? body.body.trim() : null,
-      bnReviewed: locale === "bn",
-      enReviewed: locale === "en",
+      // Every submitted story waits for a human validity decision.
+      bnReviewed: false,
+      enReviewed: false,
     },
   });
 
@@ -60,10 +61,12 @@ export async function GET(request: Request) {
   const locale = isLocale(localeParam) ? localeParam : "bn";
 
   const stories = await prisma.story.findMany({
-    where:
-      locale === "bn"
+    where: {
+      validationStatus: { in: ["VALIDATED", "UNVALIDATED"] },
+      ...(locale === "bn"
         ? { bodyBn: { not: null }, bnReviewed: true }
-        : { bodyEn: { not: null }, enReviewed: true },
+        : { bodyEn: { not: null }, enReviewed: true }),
+    },
     include: { registrant: true },
     orderBy: { createdAt: "desc" },
   });

@@ -72,3 +72,13 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.input {
+  width: 100%; padding: .7rem; margin: .35rem 0; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); background: var(--bg); color: var(--fg); font: inherit;
+}
+.actions { display: flex; gap: .6rem; margin-top: .7rem; }
+.secondaryButton {
+  padding: .6rem 1.1rem; border-radius: var(--radius-sm); cursor: pointer;
+  border: 1px solid var(--border-strong); background: transparent;
+}

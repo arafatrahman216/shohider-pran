@@ -2,6 +2,9 @@ import { getDictionary, isLocale, defaultLocale, type Locale } from "@/lib/dicti
 import Hero from "@/components/Hero";
 import RegistryCounters from "@/components/RegistryCounters";
 import ExtendedCalendar from "@/components/ExtendedCalendar";
+import DocumentedArchive from "@/components/DocumentedArchive";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home({
   params,
@@ -15,7 +18,8 @@ export default async function Home({
   return (
     <>
       <Hero dict={dict} locale={locale} />
-      <RegistryCounters dict={dict} />
+      <RegistryCounters dict={dict} locale={locale} counts={{ martyrs: 844, injured: 14369, estimatedDeaths: 1400 }} />
+      <DocumentedArchive locale={locale} />
       <ExtendedCalendar dict={dict} locale={locale} />
     </>
   );

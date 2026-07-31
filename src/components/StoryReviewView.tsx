@@ -5,81 +5,49 @@ import type { Dictionary } from "@/lib/dictionaries";
 import styles from "./StoryReviewView.module.css";
 
 type ReviewStory = {
-  id: string;
-  authorName: string | null;
-  originalLocale: "BN" | "EN";
-  bodyBn: string | null;
-  bodyEn: string | null;
-  bnReviewed: boolean;
-  enReviewed: boolean;
-  registrant: { fullName: string; district: string };
+  id: string; authorName: string | null; bodyBn: string | null; bodyEn: string | null;
+  registrant: { fullName: string; district: string; verificationStatus: string };
 };
 
 export default function StoryReviewView({ dict }: { dict: Dictionary }) {
-  const t = dict.stories;
+  const bn = dict.nav.register !== "Register";
   const [stories, setStories] = useState<ReviewStory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
-
+  const [busy, setBusy] = useState<string | null>(null);
+  const [fields, setFields] = useState<Record<string, { by: string; evidence: string; note: string }>>({});
   useEffect(() => {
-    fetch("/api/stories/review")
-      .then((res) => res.json())
-      .then((data: { stories: ReviewStory[] }) => {
-        setStories(data.stories);
-        setLoading(false);
-      });
+    fetch("/api/stories/review").then((r) => r.json()).then((d) => setStories(d.stories ?? []));
   }, []);
-
-  async function approve(storyId: string, locale: "bn" | "en") {
-    setApprovingId(storyId);
-    try {
-      await fetch(`/api/stories/${storyId}/approve`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale }),
-      });
-      setStories((prev) => prev.filter((s) => s.id !== storyId));
-    } finally {
-      setApprovingId(null);
-    }
+  function field(id: string) { return fields[id] ?? { by: "", evidence: "", note: "" }; }
+  function setField(id: string, key: "by" | "evidence" | "note", value: string) {
+    setFields((old) => ({ ...old, [id]: { ...field(id), [key]: value } }));
   }
-
-  return (
-    <div className={styles.wrapper}>
-      <h1 className={`${styles.title} display`}>{t.reviewTitle}</h1>
-      <p className={styles.subtitle}>{t.reviewSubtitle}</p>
-
-      {!loading && stories.length === 0 && <p className={styles.empty}>{t.reviewEmpty}</p>}
-
-      {stories.map((s) => {
-        const pendingLocale: "bn" | "en" = s.originalLocale === "BN" ? "en" : "bn";
-        const originalText = s.originalLocale === "BN" ? s.bodyBn : s.bodyEn;
-        const draftText = pendingLocale === "bn" ? s.bodyBn : s.bodyEn;
-
-        return (
-          <div key={s.id} className={styles.card}>
-            <p className={styles.meta}>
-              {s.registrant.fullName} · {s.registrant.district}
-            </p>
-            <div className={styles.textBlock}>
-              <p className={styles.textLabel}>{t.originalLabel}</p>
-              <p className={styles.textBody}>{originalText}</p>
-            </div>
-            <div className={styles.textBlock}>
-              <p className={styles.textLabel}>{t.draftTranslationLabel}</p>
-              <p className={styles.textBody}>{draftText}</p>
-            </div>
-            <button
-              type="button"
-              className={styles.approveButton}
-              disabled={approvingId === s.id}
-              onClick={() => approve(s.id, pendingLocale)}
-            >
-              {approvingId === s.id ? t.approving : t.approveButton}
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
+  async function decide(id: string, status: "VALIDATED" | "UNVALIDATED") {
+    setBusy(id);
+    const f = field(id);
+    const res = await fetch(`/api/stories/${id}/approve`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status, validatedBy: f.by, validationEvidence: f.evidence, validationNote: f.note }),
+    });
+    if (res.ok) setStories((old) => old.filter((s) => s.id !== id));
+    setBusy(null);
+  }
+  return <div className={styles.wrapper}>
+    <h1 className={`${styles.title} display`}>{bn ? "গল্প যাচাই" : "Story validation"}</h1>
+    <p className={styles.subtitle}>{bn ? "প্রমাণ দেখে গল্পটি যাচাইকৃত বা এখনো যাচাইকৃত নয় হিসেবে প্রকাশ করুন।" : "Review the evidence, then publish as validated or not yet validated."}</p>
+    {!stories.length && <p className={styles.empty}>{bn ? "অপেক্ষমাণ কোনো গল্প নেই।" : "No stories await review."}</p>}
+    {stories.map((s) => <article className={styles.card} key={s.id}>
+      <p className={styles.meta}>{s.registrant.fullName} · {s.registrant.district} · {s.registrant.verificationStatus}</p>
+      <p className={styles.textBody}>{s.bodyBn ?? s.bodyEn}</p>
+      <input className={styles.input} value={field(s.id).by} onChange={(e) => setField(s.id, "by", e.target.value)}
+        placeholder={bn ? "কে যাচাই করেছেন (ঐচ্ছিক)" : "Validated by (optional)"} />
+      <input className={styles.input} value={field(s.id).evidence} onChange={(e) => setField(s.id, "evidence", e.target.value)}
+        placeholder={bn ? "প্রমাণ: CCTV/নথি/সাক্ষী (ঐচ্ছিক)" : "Evidence: CCTV/document/witness (optional)"} />
+      <textarea className={styles.input} value={field(s.id).note} onChange={(e) => setField(s.id, "note", e.target.value)}
+        placeholder={bn ? "পর্যালোচনা নোট (ঐচ্ছিক)" : "Review note (optional)"} />
+      <div className={styles.actions}>
+        <button className={styles.approveButton} disabled={busy === s.id} onClick={() => decide(s.id, "VALIDATED")}>{bn ? "যাচাইকৃত" : "Validated"}</button>
+        <button className={styles.secondaryButton} disabled={busy === s.id} onClick={() => decide(s.id, "UNVALIDATED")}>{bn ? "এখনো যাচাইকৃত নয়" : "Not yet validated"}</button>
+      </div>
+    </article>)}
+  </div>;
 }

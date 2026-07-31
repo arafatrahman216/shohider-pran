@@ -165,7 +165,10 @@ export default function RegisterWizard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("request failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => null) as { error?: string } | null;
+        throw new Error(data?.error || "request failed");
+      }
       const data = (await res.json()) as { registrant: RegistrantDTO };
       clearDraft();
       setRegistrant(data.registrant);
@@ -178,7 +181,7 @@ export default function RegisterWizard({
         clearDraft();
         setQueuedOffline(true);
       } else {
-        setError(t.errorGeneric);
+        setError(err instanceof Error ? err.message : t.errorGeneric);
       }
     } finally {
       setSubmitting(false);

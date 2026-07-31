@@ -4,10 +4,9 @@ import { requireAdminApi } from "@/lib/admin-auth";
 
 export async function GET() {
   if (!(await requireAdminApi())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const stories = await prisma.story.findMany({
-    where: { validationStatus: "PENDING" },
-    include: { registrant: true },
-    orderBy: { createdAt: "asc" },
+  const issues = await prisma.authorityIssue.findMany({
+    include: { registrant: { select: { fullName: true, verificationStatus: true } }, updates: { orderBy: { createdAt: "desc" } } },
+    orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json({ stories });
+  return NextResponse.json({ issues });
 }

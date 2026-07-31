@@ -40,6 +40,12 @@ export default function Header({
         <Link href={`/${locale}/jobs`} className={styles.localeLink}>
           {dict.jobs.navLabel}
         </Link>
+        <Link href={`/${locale}/issues`} className={styles.localeLink}>
+          {locale === "bn" ? "কর্তৃপক্ষের কাছে আবেদন" : "Authority request"}
+        </Link>
+        <Link href={`/${locale}/admin/login`} className={styles.localeLink}>
+          {locale === "bn" ? "অ্যাডমিন" : "Admin"}
+        </Link>
         <Link href={`/${otherLocale}`} className={styles.localeLink}>
           {dict.nav.switchLocale}
         </Link>

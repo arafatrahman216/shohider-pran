@@ -13,9 +13,5 @@ export default async function StorySubmitPage({
   const locale: Locale = isLocale(lang) ? lang : defaultLocale;
   const dict = await getDictionary(locale);
 
-  if (!registrantId) {
-    return <p style={{ padding: "3rem 1.5rem", textAlign: "center" }}>{dict.stories.errorGeneric}</p>;
-  }
-
-  return <StorySubmitForm dict={dict} locale={locale} registrantId={registrantId} />;
+  return <StorySubmitForm dict={dict} locale={locale} initialRegistrantId={registrantId ?? ""} />;
 }

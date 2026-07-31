@@ -1,0 +1,7 @@
+cd E:\July_26_hackathon\shohider-pran
+
+npm.cmd install
+npx.cmd prisma migrate dev
+npx.cmd prisma generate
+npx.cmd prisma db seed
+npm.cmd run dev

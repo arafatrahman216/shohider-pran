@@ -2,7 +2,7 @@
 // Plain hand-written SW (no build step): Next's Turbopack dev/build doesn't
 // run this file through any bundler, it's served as-is from public/.
 
-const CACHE_VERSION = "sp-shell-v1";
+const CACHE_VERSION = "sp-shell-v2";
 const APP_SHELL = ["/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {

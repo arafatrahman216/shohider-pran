@@ -7,21 +7,22 @@ import styles from "./StorySubmitForm.module.css";
 export default function StorySubmitForm({
   dict,
   locale,
-  registrantId,
+  initialRegistrantId,
 }: {
   dict: Dictionary;
   locale: Locale;
-  registrantId: string;
+  initialRegistrantId: string;
 }) {
   const t = dict.stories;
   const [authorName, setAuthorName] = useState("");
+  const [registrantId, setRegistrantId] = useState(initialRegistrantId);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   async function submit() {
-    if (!text.trim()) {
+    if (!registrantId.trim() || !text.trim()) {
       setError(t.errorRequired);
       return;
     }
@@ -60,6 +61,13 @@ export default function StorySubmitForm({
     <div className={styles.wrapper}>
       <h1 className={`${styles.title} display`}>{t.submitTitle}</h1>
       <p className={styles.subtitle}>{t.submitSubtitle}</p>
+
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="story-registration">{locale === "bn" ? "রেজিস্ট্রেশন আইডি" : "Registration ID"}</label>
+        <input id="story-registration" className={styles.input} value={registrantId}
+          placeholder={locale === "bn" ? "আপনার রেজিস্ট্রেশন আইডি" : "Your registration ID"}
+          onChange={(e) => setRegistrantId(e.target.value)} />
+      </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="story-author">

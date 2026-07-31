@@ -13,6 +13,7 @@ type RegisterBody = {
 };
 
 export async function POST(request: Request) {
+  try {
   const body = (await request.json()) as RegisterBody;
 
   if (!body.fullName?.trim() || !body.district?.trim() || !body.category) {
@@ -49,4 +50,11 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ registrant: updated, outcome }, { status: 201 });
+  } catch (error) {
+    console.error("Registration failed", error);
+    return NextResponse.json(
+      { error: "Registration could not be saved. Make sure database migrations are applied." },
+      { status: 500 }
+    );
+  }
 }

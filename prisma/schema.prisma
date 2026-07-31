@@ -53,6 +53,21 @@ enum PetitionStatus {
   CLOSED
 }
 
+enum StoryValidationStatus {
+  PENDING
+  VALIDATED
+  UNVALIDATED
+}
+
+enum AuthorityIssueStatus {
+  SUBMITTED
+  VERIFIED
+  FORWARDED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+}
+
 // A row scraped from an official source (Section 5). Never holds narrative/
 // copyrighted description text — factual fields only.
 model GazetteRecord {
@@ -108,6 +123,7 @@ model Registrant {
   proposedPetitions   Petition[]          @relation("ProposedPetitions")
   petitionSignatures  PetitionSignature[] @relation("PetitionSignatures")
   jobSeekerProfiles   JobSeekerProfile[]
+  authorityIssues     AuthorityIssue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,10 +181,46 @@ model Story {
   bodyEn         String?
   bnReviewed     Boolean  @default(false)
   enReviewed     Boolean  @default(false)
+  validationStatus   StoryValidationStatus @default(PENDING)
+  validatedBy        String?
+  validationEvidence String?
+  validationNote     String?
+  validatedAt        DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([registrantId])
+}
+
+model AuthorityIssue {
+  id            String               @id @default(cuid())
+  issueId       String               @unique
+  registrantId  String
+  registrant    Registrant           @relation(fields: [registrantId], references: [id])
+  applicantName String
+  recipientName String
+  authorityName String
+  subject       String
+  details       String
+  status        AuthorityIssueStatus @default(SUBMITTED)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  updates       AuthorityIssueUpdate[]
+
+  @@index([registrantId])
+  @@index([status])
+}
+
+model AuthorityIssueUpdate {
+  id        String               @id @default(cuid())
+  issueId   String
+  issue     AuthorityIssue       @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  status    AuthorityIssueStatus
+  note      String
+  updatedBy String?
+  createdAt DateTime             @default(now())
+
+  @@index([issueId])
 }
 
 // Section 1 extra feature (3d) — a collective letter/petition. The AI

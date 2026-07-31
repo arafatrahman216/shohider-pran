@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "../globals.css";
 import { fontVariables } from "@/lib/fonts";
-import { themeInitScript } from "@/lib/theme-script";
 import { getDictionary, isLocale, locales, defaultLocale, type Locale } from "@/lib/dictionaries";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import ThemeInitializer from "@/components/ThemeInitializer";
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -43,10 +43,8 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
       <body>
+        <ThemeInitializer />
         <ServiceWorkerRegister />
         <Header dict={dict} locale={locale} />
         <main id="main">{children}</main>
