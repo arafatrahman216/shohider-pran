@@ -1,4 +1,4 @@
-import { NextResponse } from "next/gitserver";
+import { NextResponse } from "next/server";
 import {
   ADMIN_SESSION_COOKIE,
   checkAdminPassword,
