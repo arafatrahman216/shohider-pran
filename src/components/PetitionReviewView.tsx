@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/dictionaries";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
 import styles from "./PetitionReviewView.module.css";
 
 type ReviewPetition = {
@@ -39,6 +40,9 @@ export default function PetitionReviewView({ dict }: { dict: Dictionary }) {
 
   return (
     <div className={styles.wrapper}>
+      <div className={styles.adminBar}>
+        <AdminLogoutButton label={dict.admin.logout} />
+      </div>
       <h1 className={`${styles.title} display`}>{t.reviewTitle}</h1>
       <p className={styles.subtitle}>{t.reviewSubtitle}</p>
 

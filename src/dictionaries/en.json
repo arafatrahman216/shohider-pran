@@ -27,10 +27,9 @@
     "guardrail": "This platform does not decide who is a legitimate martyr or injured person. It reflects the official record, plus a clearly labelled pending-review queue for people the list may have missed.",
     "counters": {
       "heading": "The record so far",
-      "source": "Source: DGHS, via July Shaheed Smrity Foundation (jssfbd.com)",
+      "source": "Source: Directorate General of Health Services (DGHS), Government of Bangladesh — medical-info.dghs.gov.bd. Live count of records ingested so far; the official dataset is still being processed and this total will grow.",
       "martyrs": "Martyrs (shohid)",
-      "injured": "Injured (ahoto)",
-      "families": "Families in need"
+      "injured": "Injured (ahoto)"
     },
     "calendar": {
       "heading": "১ – ৩৬ জুলাই",
@@ -284,5 +283,16 @@
     "boardEmpty": "No open opportunities yet.",
     "errorRequired": "Please fill in all fields.",
     "errorGeneric": "Something went wrong. Please try again."
+  },
+  "admin": {
+    "login": {
+      "title": "Admin sign-in",
+      "subtitle": "Internal review tools — story, petition, and follow-up approval, and gazette re-scraping.",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "logout": "Log out"
   }
 }

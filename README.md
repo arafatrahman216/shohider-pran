@@ -13,7 +13,7 @@ verification status.
 
 ```bash
 npm install
-cp .env.local.example .env.local   # add GEMINI_API_KEY when you have one
+cp .env.local.example .env.local   # add GEMINI_API_KEY, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
 
 npx prisma migrate dev   # creates dev.db and applies the schema
 npx prisma db seed       # loads placeholder gazette records for local testing
@@ -40,6 +40,33 @@ by default (`/en` for English).
 - Real gazette data must come from the scraper module (Section 5 of the build
   plan), never be hand-authored. `prisma/seed.ts` only ever inserts data
   clearly marked `seed_dev_placeholder`.
+- The homepage registry counters (`RegistryCounters`) read live counts
+  straight from `GazetteRecord` rows scraped from `medical-info.dghs.gov.bd`
+  (`src/lib/registry-stats.ts`) — never a hardcoded or third-party-cited
+  figure. If that count looks low, it's because the DGHS scraper (Section 5)
+  hasn't been re-run recently, not because the number was fabricated.
+
+## Admin / internal review tools
+
+`/[lang]/stories/review`, `/[lang]/petitions/review`, `/[lang]/follow-up`,
+and the two `POST /api/scrape/*` triggers are internal-only — approving an
+AI-drafted story/petition translation, sending a follow-up escalation, or
+re-scraping the gazette are all actions a human reviewer takes, never
+end users. They sit behind a single shared admin password:
+
+- Set `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` in `.env.local` (see
+  `.env.local.example`).
+- Sign in at `/[lang]/admin/login`; the session is a signed, httpOnly,
+  12-hour cookie (`src/lib/admin-auth.ts` — HMAC-SHA256 via Node's built-in
+  `crypto`, no new dependency).
+- Enforced twice: once in `proxy.ts` (redirects page requests to login,
+  401s API requests) and again inside each route handler
+  (`adminAuthGuard()`) — per Next's own guidance, a proxy matcher should
+  never be the only thing standing between an admin action and the public
+  internet.
+
+There's no multi-user account system here — this is a single shared
+password for whoever's doing review work, not per-admin accounts.
 
 ## Scraper (Section 5)
 
@@ -50,7 +77,10 @@ npm run scrape
 
 This runs both source scrapers, then Section 2's auto-re-verification pass
 over every pending registration. Same effect via API: `POST /api/scrape/dghs`
-and `POST /api/scrape/jssfbd` (admin actions, no auth gate yet).
+and `POST /api/scrape/jssfbd` — both require an admin session (see "Admin /
+internal review tools" above), so pass the `sp_admin_session` cookie from a
+signed-in browser session, or extend the CLI runner with your own service
+credential if you need to automate this outside a browser.
 
 - **medical-info.dghs.gov.bd** — real and verified during development: it's
   the official DGHS public medical-case registry (the source jssfbd.com
