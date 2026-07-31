@@ -13,6 +13,7 @@ function getLocale(request: NextRequest): string {
 // Internal review tools (Section 6/8: AI drafts stories/petitions/escalations,
 // a human must approve before anything goes out) — never public.
 const ADMIN_PAGE_PATHS = [
+  "/admin",
   "/stories/review",
   "/petitions/review",
   "/follow-up",
@@ -45,9 +46,10 @@ export function proxy(request: NextRequest) {
   }
 
   const pathWithoutLocale = pathname.slice(`/${matchedLocale}`.length) || "/";
-  const isAdminPage = ADMIN_PAGE_PATHS.some(
-    (p) => pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`)
-  );
+  // /admin/login must stay reachable without a session — it's how you get one.
+  const isAdminPage =
+    pathWithoutLocale !== "/admin/login" &&
+    ADMIN_PAGE_PATHS.some((p) => pathWithoutLocale === p || pathWithoutLocale.startsWith(`${p}/`));
 
   if (isAdminPage && !hasAdminSession(request)) {
     const url = request.nextUrl.clone();

@@ -34,7 +34,7 @@ export default function AdminLoginForm({
         setSubmitting(false);
         return;
       }
-      window.location.href = next.startsWith(`/${locale}`) ? next : `/${locale}`;
+      window.location.href = next.startsWith(`/${locale}`) ? next : `/${locale}/admin`;
     } catch {
       setError(t.genericError);
       setSubmitting(false);
